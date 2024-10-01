@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: Smartbiz-App
+  datasource:
+    url: jdbc:mysql://localhost:3306/smartbiz
+    username: root
+    password: Asish9776@
+  jpa:
+    hibernate:
+      ddl-auto: update
+      
