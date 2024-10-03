@@ -35,7 +35,7 @@ public class Store {
 	private User owner;
 	
 	@OneToMany(mappedBy = "store",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-	private Set<Order> orders;
+	private Set<Orders> orders;
 	
 	@CreationTimestamp
 	private Date createdAt;

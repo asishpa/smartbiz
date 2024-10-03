@@ -26,8 +26,8 @@ import lombok.NoArgsConstructor;
 @Data
 public class User {
 	@Id
-	@GeneratedValue(strategy = GenerationType.UUID)
-	private String userId;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long userId;
 	@Column(nullable = false,unique = true)
 	private String userName;
 	@Column(nullable = false,unique = true)
@@ -44,8 +44,8 @@ public class User {
 	private Set<UserRole> roles = new HashSet<>();
 	
 	@OneToMany(mappedBy = "owner",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-	private Store store;
+	private Set<Store> store;
 	
 	@OneToMany(mappedBy = "customer",cascade = CascadeType.ALL)
-	private Set<Order> orders;
+	private Set<Orders> orders;
 }

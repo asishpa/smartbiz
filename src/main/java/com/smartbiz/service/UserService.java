@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.smartbiz.entity.User;
 import com.smartbiz.exceptions.UserExistsException;
-import com.smartbiz.model.RegisterSeller;
+import com.smartbiz.model.RegisterUser;
 import com.smartbiz.repository.RoleRepository;
 import com.smartbiz.repository.UserRepository;
 
@@ -19,10 +19,9 @@ public class UserService {
 	@Autowired
 	private RoleRepository roleRepo;
 	
-	@Autowired
 	private PasswordEncoder passwordEncoder;
 	
-	public User registerUser(RegisterSeller request) {
+	public boolean registerUser(RegisterUser request) {
 		if (userRepo.findByEmail(request.getEmail()).isPresent()) {
 			throw new UserExistsException("User already exists with given email");
 		}
@@ -33,6 +32,7 @@ public class UserService {
 		user.setEmail(request.getEmail());
 		user.setEmailVerified(false);
 		user.setPassword(encodedPwd);
-		return user;
+		userRepo.save(user);
+		return true;
 	}
 }
