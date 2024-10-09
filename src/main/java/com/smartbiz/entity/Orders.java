@@ -20,19 +20,19 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 public class Orders {
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
+
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "customer_id",nullable = false)
+	@JoinColumn(name = "customer_id", nullable = false)
 	private User customer;
-	
+
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "store_id",nullable = false)
+	@JoinColumn(name = "store_id", nullable = false)
 	private Store store;
-	
+
 	@CreationTimestamp
 	private Date createdAt;
 }

@@ -16,12 +16,16 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
+@EqualsAndHashCode(exclude = "owner")
+@ToString(exclude = "owner")
 public class Store {
 	
 	@Id
@@ -39,4 +43,10 @@ public class Store {
 	
 	@CreationTimestamp
 	private Date createdAt;
+	
+	@OneToMany(mappedBy = "store",cascade = CascadeType.ALL)
+	private Set<Warehouse> warehouse;
+	
+	@OneToOne(mappedBy = "store",cascade = CascadeType.ALL)
+	private Inventory inventory;
 }
