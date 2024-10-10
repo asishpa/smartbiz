@@ -1,6 +1,6 @@
 package com.smartbiz.entity;
 
-import org.hibernate.annotations.GeneratorType;
+import java.util.List;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -24,10 +24,8 @@ public class Inventory {
 	private Long inventoryId;
 	private Integer qunatity;
 	@OneToOne
-	@JoinColumn(name = "store_id",nullable = false)
+	@JoinColumn(name = "store_id", nullable = false)
 	private Store store;
-	
-	
-	@OneToMany(mappedBy = "inventory",cascade = CascadeType.ALL)
-	private Warehouse warehouse;
+	@OneToMany(mappedBy = "inventory", cascade = CascadeType.ALL)
+	private List<Warehouse> warehouses;
 }
