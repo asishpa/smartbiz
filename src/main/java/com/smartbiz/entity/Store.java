@@ -29,8 +29,8 @@ import lombok.ToString;
 public class Store {
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+	@GeneratedValue(strategy = GenerationType.UUID)
+	private String id;
 	
 	private String name;
 	
@@ -49,4 +49,7 @@ public class Store {
 	
 	@OneToOne(mappedBy = "store",cascade = CascadeType.ALL)
 	private Inventory inventory;
+	
+	@OneToMany(mappedBy = "store",cascade = CascadeType.ALL)
+	private Set<Categories> category;
 }

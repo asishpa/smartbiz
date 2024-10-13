@@ -11,11 +11,12 @@ import org.springframework.stereotype.Repository;
 import com.smartbiz.entity.User;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, Long>{
+public interface UserRepository extends JpaRepository<User, String>{
 	
 	Optional<User> findByEmail(String email);
 	@Query("SELECT r.roleName FROM User u JOIN u.roles r WHERE u.email = :email")
 	List<String> findRoleNamesByEmail(@Param("email") String email);
-
+	@Query("SELECT u.userId FROM User u WHERE u.email = :email")
+	String findUserIdByUserName(String email);
 
 }

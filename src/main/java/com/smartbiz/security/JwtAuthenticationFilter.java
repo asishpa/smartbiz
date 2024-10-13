@@ -36,6 +36,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String requestHeader = request.getHeader("Authorization");
         String username = null;
         String token = null;
+     // Log the incoming request details
+        System.out.println("Incoming request: " + request.getRequestURI());
+        System.out.println("Authorization header: " + requestHeader);
 
         // If there's no Authorization header or it doesn't start with "Bearer ", just continue the filter chain
         if (requestHeader == null || !requestHeader.startsWith("Bearer ")) {
@@ -44,9 +47,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         token = requestHeader.substring(7);
-
+        System.out.println("token"+token);
         try {
             username = this.jwtHelper.getUserNameFromToken(token);
+            System.out.println(username);
         } catch (IllegalArgumentException | ExpiredJwtException | MalformedJwtException e) {
             logger.error("JWT token error: {}", e.getMessage());
             filterChain.doFilter(request, response);
@@ -56,9 +60,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // If username is available and no authentication exists in the context
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
+            System.out.println(userDetails);
             // Validate JWT token with user details
             if (jwtHelper.validateToken(token, userDetails)) {
-                UsernamePasswordAuthenticationToken authenticationToken = 
+            	System.out.println("JWT Token is valid. Setting authentication in SecurityContextHolder.");
+            	UsernamePasswordAuthenticationToken authenticationToken = 
                     new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 

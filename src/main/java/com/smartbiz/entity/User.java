@@ -42,8 +42,8 @@ import lombok.ToString;
 public class User {
     
 	@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userId;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String userId;
     
     @Column(nullable = false)
     private String userName;

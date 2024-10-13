@@ -20,8 +20,8 @@ import lombok.NoArgsConstructor;
 @Data
 public class Inventory {
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long inventoryId;
+	@GeneratedValue(strategy = GenerationType.UUID)
+	private String inventoryId;
 	private Integer qunatity;
 	@OneToOne
 	@JoinColumn(name = "store_id", nullable = false)

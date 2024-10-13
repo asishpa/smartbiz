@@ -24,6 +24,10 @@ public class JwtHelper {
 	public static final long JWT_TOKEN_VALIDITY = 5 * 60 * 40;
 	private static final String secret = "5367566B59703373367639792F423F4528482B4D6251655468576D5A71347437";
 
+	public String getUserIdFromToken(String token) {
+		return getClaimFromToken(token, claims -> (String) claims.get("userId"));
+	}
+	
 	public String getUserNameFromToken(String token) {
 		return getClaimFromToken(token, Claims::getSubject);
 	}
@@ -60,6 +64,19 @@ public class JwtHelper {
 	public Boolean validateToken(String token, UserDetails userDetails) {
 		final String username = getUserNameFromToken(token);
 		final String role = getRoleFromToken(token);
+		System.out.println("Username from token: " + username);
+		System.out.println("roles"+role);
+		 // Check if the username matches the UserDetails
+	    boolean isUsernameValid = username.equals(userDetails.getUsername());
+	    System.out.println("Is username valid: " + isUsernameValid);
+	    
+	    // Check if the token is expired
+	    boolean isTokenExpired = isTokenExpired(token);
+	    System.out.println("Is token expired: " + isTokenExpired);
+	    
+	    // Check if the role is valid
+	    boolean isValidRole = isValidRole(role);
+	    System.out.println("Is role valid: " + isValidRole);
 		return (username.equals(userDetails.getUsername()) && !isTokenExpired(token) && isValidRole(role));
 	}
 
@@ -78,6 +95,6 @@ public class JwtHelper {
 	}
 
 	private boolean isValidRole(String role) {
-		return "customer".equals(role) || "store_owner".equals(role);
+		return "customer".equals(role) || "STORE_OWNER".equals(role);
 	}
 }

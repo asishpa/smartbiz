@@ -21,8 +21,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Warehouse {
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long warehouseId;
+	@GeneratedValue(strategy = GenerationType.UUID)
+	private String warehouseId;
 	private String wareHouseName;
 	private String contactPerson;
 	private Long mobileNo;

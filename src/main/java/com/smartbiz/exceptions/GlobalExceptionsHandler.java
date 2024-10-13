@@ -46,4 +46,10 @@ public class GlobalExceptionsHandler {
 
 		return new ResponseEntity<>(errorDetails, HttpStatus.FORBIDDEN);
 	}
+	@ExceptionHandler(ResourceNotFoundException.class)
+	public ResponseEntity<ApiError> handleResourceNotFoundException(ResourceNotFoundException ex,WebRequest request){
+		ApiError errorDetails = new ApiError(new Date(), ex.getMessage(), request.getDescription(false));
+		return new ResponseEntity<>(errorDetails,HttpStatus.BAD_REQUEST);
+	}
+	
 }
