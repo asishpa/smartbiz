@@ -20,6 +20,7 @@ jobs:
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
+          distribution: 'temurin'  # You can use other distributions like 'zulu', 'adopt', etc.
           java-version: '17'
 
       # Step 3: Cache Maven dependencies
