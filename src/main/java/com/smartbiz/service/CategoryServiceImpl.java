@@ -88,6 +88,20 @@ public class CategoryServiceImpl implements CategoryService {
 				.map(this::convertToDto)
 				.collect(Collectors.toList());
 		}
+	@Override
+	public List<CategoriesDTO> viewCategory(String storeId) {
+		String authenticatedUserId = securityUtil.getAuthenticatedUserId();
+		Store store = storeRepo.findById(storeId).orElseThrow(() -> new ResourceNotFoundException("Store not found"));
+
+		if (!store.getOwner().getUserId().equals(authenticatedUserId)) {
+			throw new UnauthorizedAccessException("You are not allowed to add a category to this store");
+		}
+		return categoryRepo.findByStore(store)
+				.stream()
+				.map(this::convertToDto)
+				.collect(Collectors.toList());
+	}
+
 	private CategoriesDTO convertToDto(Categories category) {
 		CategoriesDTO dto = new CategoriesDTO();
 		dto.setCategoryId(category.getCategoryId());
@@ -97,4 +111,5 @@ public class CategoryServiceImpl implements CategoryService {
 		return dto;
 	}
 
+	
 }

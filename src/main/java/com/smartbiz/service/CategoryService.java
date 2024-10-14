@@ -12,4 +12,6 @@ public interface CategoryService {
 	public List<CategoriesDTO> deleteCategory(String categoryId,String storeId);
 
 	public List<CategoriesDTO> editCategoy(String categoryId, AddCategory category,String storeId);
+	
+	public List<CategoriesDTO> viewCategory(String storeId);
 }
