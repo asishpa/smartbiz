@@ -1,5 +1,8 @@
 package com.smartbiz.entity;
 
+import java.util.List;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -23,6 +26,12 @@ public class Products {
 	@ManyToOne
 	@JoinColumn(name = "category_id",nullable = false)
 	private Categories category;
+	private String productDesc;
+	private Float actualPrice;
+	private Float discountedPrice;
+	
+	@OneToMany(mappedBy = "product",cascade = CascadeType.ALL,orphanRemoval = true)
+	private List<ProductPhoto> photos;
 	@ManyToOne
 	@JoinColumn(name = "inventory_id",nullable = false)
 	private Inventory inventory;

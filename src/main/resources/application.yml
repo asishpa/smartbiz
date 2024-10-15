@@ -15,5 +15,8 @@ springdoc:
     path: /api-docs
   swagger-ui:
     operations-sorter: method
-    
-    
+cloudinary:
+  cloud_name: ${cloud_name}
+  api_key: ${cloudinary_api_key}
+  api_secret: ${cloudinary_api_secret}
+   
