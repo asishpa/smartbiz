@@ -23,13 +23,14 @@ public class ProductPhotoServiceImpl implements ProductPhotoService{
 	public Map<String, String> uploadFile(MultipartFile file) {
 		try {
 			HashMap<Object, Object> options = new HashMap<>();
-			options.put("folder", "images/product");
+			options.put("folder", "product");
 			Map uploadedFile = cloudinary.uploader().upload(file.getBytes(), options);
 			String publicId = (String)uploadedFile.get("public_id");
 			String imageUrl = cloudinary.url().secure(true).generate(publicId);
 			//save to db
 			ProductPhoto photo = new ProductPhoto();
-			photo.setUrl(imageUrl);
+			//photo.setUrl(imageUrl);
+			photo.setPublicId(publicId);
 			photoRepo.save(photo);
 			
 			return Map.of("url",imageUrl);

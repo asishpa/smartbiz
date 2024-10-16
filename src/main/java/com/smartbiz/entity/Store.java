@@ -47,9 +47,7 @@ public class Store {
 	@OneToMany(mappedBy = "store",cascade = CascadeType.ALL)
 	private Set<Warehouse> warehouse;
 	
-	@OneToOne(mappedBy = "store",cascade = CascadeType.ALL)
-	private Inventory inventory;
-	
+
 	@OneToMany(mappedBy = "store",cascade = CascadeType.ALL)
 	private Set<Categories> category;
 }

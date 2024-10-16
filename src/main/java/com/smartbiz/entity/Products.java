@@ -1,6 +1,7 @@
 package com.smartbiz.entity;
 
 import java.util.List;
+import java.util.Set;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -32,7 +33,7 @@ public class Products {
 	
 	@OneToMany(mappedBy = "product",cascade = CascadeType.ALL,orphanRemoval = true)
 	private List<ProductPhoto> photos;
-	@ManyToOne
-	@JoinColumn(name = "inventory_id",nullable = false)
-	private Inventory inventory;
+	
+	@OneToMany(mappedBy = "product")
+	private Set<ProductWarehouseInventory> warehouseInventories;
 }

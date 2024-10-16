@@ -33,12 +33,10 @@ public class CategoryServiceImpl implements CategoryService {
 	public List<CategoriesDTO> addCategory(String storeId, AddCategory addCategory) {
 		String authenticatedUserId = securityUtil.getAuthenticatedUserId();
 		Store store = storeRepo.findById(storeId).orElseThrow(() -> new ResourceNotFoundException("Store not found"));
-		System.out.println("enetered2");
 		if (!store.getOwner().getUserId().equals(authenticatedUserId)) {
 			System.out.println("entered1");
 			throw new UnauthorizedAccessException("You are not allowed to add a category to this store");
 		}
-		System.out.println("enetered");
 		Categories category = new Categories();
 		System.out.println("get category name"+addCategory.getCategoryName());
 		category.setCategoryName(addCategory.getCategoryName());

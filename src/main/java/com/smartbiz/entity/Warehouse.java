@@ -1,6 +1,7 @@
 package com.smartbiz.entity;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -11,6 +12,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,7 +25,7 @@ public class Warehouse {
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
 	private String warehouseId;
-	private String wareHouseName;
+	private String warehouseName;
 	private String contactPerson;
 	private Long mobileNo;
 	private String flatHouseNo;
@@ -40,8 +42,7 @@ public class Warehouse {
 	@JoinColumn(name = "store_id",nullable = false)
 	private Store store;
 	
-	@ManyToOne
-	@JoinColumn(name = "inventory_id",nullable =  false)
-	private Inventory inventory;
-
+	@OneToMany(mappedBy = "warehouse")
+	private Set<ProductWarehouseInventory> productInventories;
+	
 }

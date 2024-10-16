@@ -3,16 +3,12 @@ package com.smartbiz.service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.smartbiz.constants.AppConstants;
-import com.smartbiz.dto.UserDTO;
 import com.smartbiz.entity.Role;
 import com.smartbiz.entity.Store;
 import com.smartbiz.entity.User;
@@ -20,7 +16,6 @@ import com.smartbiz.exceptions.InvalidCredentialsException;
 import com.smartbiz.exceptions.RoleNotFoundException;
 import com.smartbiz.exceptions.UnauthorizedAccessException;
 import com.smartbiz.exceptions.UserExistsException;
-import com.smartbiz.mapper.EntityMapper;
 import com.smartbiz.model.LoginSeller;
 import com.smartbiz.model.RegisterSeller;
 import com.smartbiz.repository.RoleRepository;
@@ -41,8 +36,6 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 
-	@Autowired
-	private EntityMapper entityMapper;
 
 	@Override
 	@Transactional

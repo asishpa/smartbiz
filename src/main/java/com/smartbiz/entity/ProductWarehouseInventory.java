@@ -7,19 +7,19 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProductPhoto {
+public class ProductWarehouseInventory {
 	@Id
-	private String publicId;
-	private String url;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 	@ManyToOne
-	@JoinColumn(name = "product_id",nullable = true)
+	@JoinColumn(name = "product_id",nullable = false)
 	private Products product;
-
+	@ManyToOne
+	@JoinColumn(name = "warehouse_id",nullable = false)
+	private Warehouse warehouse;
 }
