@@ -51,11 +51,11 @@ jobs:
       - name: Push Docker image
         run: docker push ${{ secrets.DOCKER_USERNAME }}/smartbiz-app:latest
 
-      # Step 8: Deploy to Render
+      # Step 8: Deploy to Render using the deploy hook URL
       - name: Deploy to Render
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}  # Ensure this secret is set correctly in your repository
         run: |
-          curl -X POST https://api.render.com/v1/deploy/svc-cs3iun0gph6c73c30ucg \
-          -H "Authorization: Bearer $RENDER_API_KEY" \
-          -H "Content-Type: application/json"
+          DEPLOY_HOOK_URL="https://api.render.com/deploy/srv-cs3iun0gph6c73c30ucg?key=${{ secrets.RENDER_API_KEY }}&imgURL=docker.io%2F${{ secrets.DOCKER_USERNAME }}%2Fsmartbiz-app%3Alatest"
+          curl -X POST "$DEPLOY_HOOK_URL" \
+          -H "Content-Type: application/json" || exit 1
