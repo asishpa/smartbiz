@@ -54,11 +54,8 @@ jobs:
       # Step 8: Deploy to Render
       - name: Deploy to Render
         env:
-          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}  # Add this to your repository secrets
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}  # Ensure this secret is set correctly in your repository
         run: |
-          curl -X POST https://api.render.com/v1/deploy/svc-cs3iun0gph6c73c30ucg  # Replace with your Render service ID
+          curl -X POST https://api.render.com/v1/deploy/svc-cs3iun0gph6c73c30ucg \
           -H "Authorization: Bearer $RENDER_API_KEY" \
-          -H "Content-Type: application/json" \
-          -d '{
-            "serviceId": "svc-cs3iun0gph6c73c30ucg"  # Your Render service ID
-          }'
+          -H "Content-Type: application/json"
