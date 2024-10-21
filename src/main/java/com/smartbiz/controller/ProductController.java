@@ -17,9 +17,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.smartbiz.dto.CategoriesDTO;
+import com.smartbiz.dto.ProductsDTO;
 import com.smartbiz.entity.Categories;
 import com.smartbiz.model.AddCategory;
+import com.smartbiz.model.AddProduct;
 import com.smartbiz.service.CategoryService;
+import com.smartbiz.service.ProductService;
 
 
 @RestController
@@ -29,6 +32,8 @@ public class ProductController {
 	@Autowired
 	private CategoryService categoryService;
 
+	@Autowired
+	private ProductService productService;
 	@GetMapping("/{storeId}/categories")
 	public ResponseEntity<List<CategoriesDTO>> viewCategory(@PathVariable String storeId){
 		List<CategoriesDTO> categories = categoryService.viewCategory(storeId);
@@ -54,4 +59,10 @@ public class ProductController {
 		List<CategoriesDTO> categories = categoryService.editCategoy(categoryId, updatedCategory, storeId);
 		return new ResponseEntity<>(categories, HttpStatus.OK);
 	}
+	@PostMapping("/{storeId}/products")
+	public ResponseEntity<List<ProductsDTO>> addProduct(@PathVariable String storeId,@RequestBody AddProduct addProduct){
+		List<ProductsDTO> products = productService.addProduct(storeId, addProduct);
+		return new ResponseEntity<>(products,HttpStatus.CREATED)
+;	}
+	
 }

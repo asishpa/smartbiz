@@ -25,7 +25,12 @@ public class ProductPhotoServiceImpl implements ProductPhotoService{
 			HashMap<Object, Object> options = new HashMap<>();
 			options.put("folder", "product");
 			Map uploadedFile = cloudinary.uploader().upload(file.getBytes(), options);
-			String publicId = (String)uploadedFile.get("public_id");
+			String fullPublicId = (String)uploadedFile.get("public_id");
+			// Strip off the folder name if present (get part after the last "/")
+            String publicId = fullPublicId.contains("/") 
+                    ? fullPublicId.substring(fullPublicId.lastIndexOf("/") + 1) 
+                    : fullPublicId;
+            
 			String imageUrl = cloudinary.url().secure(true).generate(publicId);
 			//save to db
 			ProductPhoto photo = new ProductPhoto();
@@ -33,7 +38,7 @@ public class ProductPhotoServiceImpl implements ProductPhotoService{
 			photo.setPublicId(publicId);
 			photoRepo.save(photo);
 			
-			return Map.of("url",imageUrl);
+			 return Map.of("publicId", publicId);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;

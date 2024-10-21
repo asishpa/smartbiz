@@ -30,10 +30,17 @@ public class Products {
 	private String productDesc;
 	private Float actualPrice;
 	private Float discountedPrice;
+	private Float weight;
+	private String hsnCode;
+	
 	
 	@OneToMany(mappedBy = "product",cascade = CascadeType.ALL,orphanRemoval = true)
 	private List<ProductPhoto> photos;
 	
 	@OneToMany(mappedBy = "product")
 	private Set<ProductWarehouseInventory> warehouseInventories;
+	
+	@ManyToOne
+	@JoinColumn(name = "store_id",nullable = false)
+	private Store store;
 }

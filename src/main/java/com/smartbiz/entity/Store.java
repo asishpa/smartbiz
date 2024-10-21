@@ -41,6 +41,9 @@ public class Store {
 	@OneToMany(mappedBy = "store",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
 	private Set<Orders> orders;
 	
+	@OneToMany(mappedBy = "store",cascade = CascadeType.ALL)
+	private Set<Products> products;
+	
 	@CreationTimestamp
 	private Date createdAt;
 	

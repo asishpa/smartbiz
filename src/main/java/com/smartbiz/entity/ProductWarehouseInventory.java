@@ -7,11 +7,13 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
+@Data
 public class ProductWarehouseInventory {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,4 +24,6 @@ public class ProductWarehouseInventory {
 	@ManyToOne
 	@JoinColumn(name = "warehouse_id",nullable = false)
 	private Warehouse warehouse;
+	
+	private Integer quantity;
 }

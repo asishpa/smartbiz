@@ -17,7 +17,6 @@ import lombok.NoArgsConstructor;
 public class ProductPhoto {
 	@Id
 	private String publicId;
-	private String url;
 	@ManyToOne
 	@JoinColumn(name = "product_id",nullable = true)
 	private Products product;

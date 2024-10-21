@@ -12,11 +12,9 @@ public class AddProduct {
 	private Float actualPrice;
 	private Float discountedPrice;
 	private List<String> photoPublicId;
-	private Map<String, Integer> warehouseQty;
-	
-	
-	
+	private Map<String, Integer> inventoryList;
+	private Float weight;
+	private String hsnCode;
 	private String productDesc;
-	
 
 }

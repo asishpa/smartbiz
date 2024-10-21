@@ -1,7 +1,10 @@
 package com.smartbiz.service;
 
-import com.smartbiz.entity.Products;
+import java.util.List;
+
+import com.smartbiz.dto.ProductsDTO;
+import com.smartbiz.model.AddProduct;
 
 public interface ProductService {
-	public Products addProduct();
+	public List<ProductsDTO> addProduct(String storeId,AddProduct addProduct);
 }

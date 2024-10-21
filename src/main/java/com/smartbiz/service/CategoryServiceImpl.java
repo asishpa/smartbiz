@@ -31,12 +31,7 @@ public class CategoryServiceImpl implements CategoryService {
 
 	@Override
 	public List<CategoriesDTO> addCategory(String storeId, AddCategory addCategory) {
-		String authenticatedUserId = securityUtil.getAuthenticatedUserId();
 		Store store = storeRepo.findById(storeId).orElseThrow(() -> new ResourceNotFoundException("Store not found"));
-		if (!store.getOwner().getUserId().equals(authenticatedUserId)) {
-			System.out.println("entered1");
-			throw new UnauthorizedAccessException("You are not allowed to add a category to this store");
-		}
 		Categories category = new Categories();
 		System.out.println("get category name"+addCategory.getCategoryName());
 		category.setCategoryName(addCategory.getCategoryName());
@@ -52,12 +47,8 @@ public class CategoryServiceImpl implements CategoryService {
 
 	@Override
 	public List<CategoriesDTO> deleteCategory(String categoryId,String storeId) {
-		String authenticatedUserId = securityUtil.getAuthenticatedUserId();
 		Store store = storeRepo.findById(storeId).orElseThrow(() -> new ResourceNotFoundException("Store not found"));
 
-		if (!store.getOwner().getUserId().equals(authenticatedUserId)) {
-			throw new UnauthorizedAccessException("You are not allowed to add a category to this store");
-		}
 		Categories category = categoryRepo.findById(categoryId)
 				.orElseThrow(() -> new ResourceNotFoundException("Category Not found with given ID"));
 		categoryRepo.delete(category);
@@ -69,12 +60,7 @@ public class CategoryServiceImpl implements CategoryService {
 
 	@Override
 	public List<CategoriesDTO> editCategoy(String categoryId, AddCategory updatedCategory,String storeId) {
-		String authenticatedUserId = securityUtil.getAuthenticatedUserId();
 		Store store = storeRepo.findById(storeId).orElseThrow(() -> new ResourceNotFoundException("Store not found"));
-
-		if (!store.getOwner().getUserId().equals(authenticatedUserId)) {
-			throw new UnauthorizedAccessException("You are not allowed to add a category to this store");
-		}
 		Categories existingCategory = categoryRepo.findById(categoryId)
 				.orElseThrow(() -> new ResourceNotFoundException("Category not found with given Id"));
 		existingCategory.setCategoryName(updatedCategory.getCategoryName());
@@ -88,12 +74,8 @@ public class CategoryServiceImpl implements CategoryService {
 		}
 	@Override
 	public List<CategoriesDTO> viewCategory(String storeId) {
-		String authenticatedUserId = securityUtil.getAuthenticatedUserId();
 		Store store = storeRepo.findById(storeId).orElseThrow(() -> new ResourceNotFoundException("Store not found"));
 
-		if (!store.getOwner().getUserId().equals(authenticatedUserId)) {
-			throw new UnauthorizedAccessException("You are not allowed to add a category to this store");
-		}
 		return categoryRepo.findByStore(store)
 				.stream()
 				.map(this::convertToDto)
