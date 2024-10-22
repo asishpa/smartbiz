@@ -21,6 +21,7 @@ import com.smartbiz.dto.ProductsDTO;
 import com.smartbiz.entity.Categories;
 import com.smartbiz.model.AddCategory;
 import com.smartbiz.model.AddProduct;
+import com.smartbiz.model.Toggle;
 import com.smartbiz.service.CategoryService;
 import com.smartbiz.service.ProductService;
 
@@ -64,5 +65,26 @@ public class ProductController {
 		List<ProductsDTO> products = productService.addProduct(storeId, addProduct);
 		return new ResponseEntity<>(products,HttpStatus.CREATED)
 ;	}
+	@GetMapping("/{storeId}/products")
+	public ResponseEntity<List<ProductsDTO>> getProduct(@PathVariable String storeId){
+		List<ProductsDTO> products = productService.getProducts(storeId);
+		return new ResponseEntity<>(products,HttpStatus.OK);
+	}
+	@PatchMapping("/{storeId}/products/{productId}")
+	public ResponseEntity<ProductsDTO> partialUpdateProduct(@PathVariable String storeId,@PathVariable String poductId,@RequestBody Toggle toggle){
+		ProductsDTO product = productService.partialUpdate(storeId, poductId, toggle.getIsActive());
+		return new ResponseEntity<>(product,HttpStatus.ACCEPTED);
+	}
+	@DeleteMapping("/{storeId}/products/{productId}")
+	public ResponseEntity<String> deleteProduct(@PathVariable String storeId,@PathVariable String productId){
+		boolean isDeleted = productService.deleteProduct(storeId, productId);
+		if (isDeleted) {
+			return ResponseEntity.ok("Product deleted successfully");
+		}
+		else {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product does not exist");
+		}
+	}
 	
+		
 }

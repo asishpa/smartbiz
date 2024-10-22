@@ -17,6 +17,7 @@ public class ProductsDTO {
     private Float weight;
     private String hsnCode;
     private String storeName;
+    private boolean isActive;
     private List<String> photoPublicId;
     private List<ProductWarehouseDTO> inventory;
 }

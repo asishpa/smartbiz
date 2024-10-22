@@ -1,6 +1,6 @@
 name: Build and Deploy Spring Boot App
 
-# Trigger the workflow on push to the main branch or when a pull request is merged
+# Trigger the workflow on push to the master branch or when a pull request is merged
 on:
   push:
     branches:
@@ -51,11 +51,15 @@ jobs:
       - name: Push Docker image
         run: docker push ${{ secrets.DOCKER_USERNAME }}/smartbiz-app:latest
 
-      # Step 8: Deploy to Render using the deploy hook URL
-      - name: Deploy to Render
-        env:
-          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}  # Ensure this secret is set correctly in your repository
-        run: |
-          DEPLOY_HOOK_URL="https://api.render.com/deploy/srv-cs3iun0gph6c73c30ucg?key=${{ secrets.RENDER_API_KEY }}&imgURL=docker.io%2F${{ secrets.DOCKER_USERNAME }}%2Fsmartbiz-app%3Alatest"
-          curl -X POST "$DEPLOY_HOOK_URL" \
-          -H "Content-Type: application/json" || exit 1
+  # Job to deploy to Render
+  deploy:
+    name: Deploy
+    needs: [build]  # Deploy only runs after the build job
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to production on Render
+        uses: johnbeynon/render-deploy-action@v0.0.8
+        with:
+          service-id: ${{ secrets.SERVICE_ID }}  # Render service ID
+          api-key: ${{ secrets.RENDER_API_KEY }}  # Render API key from Render Dashboard

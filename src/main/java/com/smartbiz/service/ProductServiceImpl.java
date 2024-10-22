@@ -3,9 +3,11 @@ package com.smartbiz.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.google.common.base.Optional;
 import com.smartbiz.dto.ProductWarehouseDTO;
 import com.smartbiz.dto.ProductsDTO;
 import com.smartbiz.entity.Categories;
@@ -17,6 +19,7 @@ import com.smartbiz.entity.Warehouse;
 import com.smartbiz.exceptions.ResourceNotFoundException;
 import com.smartbiz.mapper.EntityMapper;
 import com.smartbiz.model.AddProduct;
+import com.smartbiz.model.Toggle;
 import com.smartbiz.repository.CategoryRepository;
 import com.smartbiz.repository.InventoryRepo;
 import com.smartbiz.repository.ProductsPhotoRepository;
@@ -35,19 +38,20 @@ public class ProductServiceImpl implements ProductService {
 
 	@Autowired
 	private InventoryRepo inventoryRepo;
-	
+
 	@Autowired
 	private StoreRepository storeRepo;
 
 	@Autowired
 	private ProductsRepository productRepo;
-	
+
 	@Autowired
 	private ProductsPhotoRepository productPhotoRepo;
 	@Autowired
 	private EntityMapper entityMapper;
+
 	@Override
-	public List<ProductsDTO> addProduct(String storeId,AddProduct addProduct) {
+	public List<ProductsDTO> addProduct(String storeId, AddProduct addProduct) {
 		Store store = storeRepo.findById(storeId).orElseThrow(() -> new ResourceNotFoundException("Store not found"));
 		Categories category = categoryRepo.findById(addProduct.getCategoryId())
 				.orElseThrow(() -> new ResourceNotFoundException("Category Not found with given ID"));
@@ -59,12 +63,12 @@ public class ProductServiceImpl implements ProductService {
 		product.setCategory(category);
 		product.setHsnCode(addProduct.getHsnCode());
 		product.setWeight(addProduct.getWeight());
-		
-		product.setStore(store);
-		 List<ProductPhoto> existingPhotos = productPhotoRepo.findByPublicIdIn(addProduct.getPhotoPublicId());
-		    existingPhotos.forEach(photo -> photo.setProduct(product)); // Set the product reference
 
-		    product.setPhotos(existingPhotos);
+		product.setStore(store);
+		List<ProductPhoto> existingPhotos = productPhotoRepo.findByPublicIdIn(addProduct.getPhotoPublicId());
+		existingPhotos.forEach(photo -> photo.setProduct(product)); // Set the product reference
+
+		product.setPhotos(existingPhotos);
 		Products savedProduct = productRepo.save(product);
 		addProduct.getInventoryList().forEach((warehouseId, quantity) -> {
 			Warehouse warehouse = warehouseRepo.findById(warehouseId)
@@ -74,11 +78,49 @@ public class ProductServiceImpl implements ProductService {
 			inventory.setWarehouse(warehouse);
 			inventory.setQuantity(quantity);
 			inventoryRepo.save(inventory);
+			// Debugging output
+			System.out.println("Saved Inventory for Product ID: " + savedProduct.getId() + " Warehouse ID: "
+					+ warehouseId + " Quantity: " + quantity);
 
 		});
-		
-	    // Manual conversion from Products to ProductsDTO
-	    return productRepo.findByStore(store).stream().map(entityMapper::toProductsDTO).collect(Collectors.toList());
+
+		return productRepo.findByStore(store).stream().map(entityMapper::toProductsDTO).collect(Collectors.toList());
 	}
-	
+
+	@Override
+	public List<ProductsDTO> getProducts(String storeId) {
+		// Find store by storeId or throw ResourceNotFoundException
+		Store store = storeRepo.findById(storeId)
+				.orElseThrow(() -> new ResourceNotFoundException("Store does not exist with the specified storeId"));
+
+		return productRepo.findByStore(store).stream().map(entityMapper::toProductsDTO).collect(Collectors.toList());
+
+	}
+
+	@Override
+	public boolean deleteProduct(String storeId, String productId) {
+		// Store store = storeRepo.findById(storeId).orElseThrow(() -> new
+		// ResourceNotFoundException("Store does not exist with the specified
+		// storeId"));
+		Optional<Products> product = productRepo.findByIdAndStoreId(productId, storeId);
+		if (product.isPresent()) {
+			productRepo.deleteByIdAndStoreId(productId, storeId);
+			return true;
+		} else {
+			return false;
+		}
+
+	}
+
+	@Override
+	public ProductsDTO partialUpdate(String storeId, String productId, Boolean status) {
+	    Products product = productRepo.findById(productId).orElseThrow(() -> new ResourceNotFoundException("productId does not exist"));
+
+	    product.setActive(status);
+
+	    productRepo.save(product);
+
+	    // Return the updated product DTO
+	    return entityMapper.toProductsDTO(product);
+	}
 }
