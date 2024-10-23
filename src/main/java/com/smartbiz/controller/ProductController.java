@@ -49,7 +49,7 @@ public class ProductController {
 
 	@DeleteMapping("/{storeId}/categories/{categoryId}")
 	public ResponseEntity<List<CategoriesDTO>> deleteCategory(@PathVariable String storeId, @PathVariable String categoryId) {
-		List<CategoriesDTO> categories = categoryService.deleteCategory(categoryId, storeId);
+		List<CategoriesDTO> categories = categoryService.deleteCategory(storeId, categoryId);
 		return new ResponseEntity<List<CategoriesDTO>>(categories,HttpStatus.ACCEPTED);
 
 	}
