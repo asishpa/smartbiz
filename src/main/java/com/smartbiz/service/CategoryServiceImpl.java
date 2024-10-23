@@ -81,7 +81,14 @@ public class CategoryServiceImpl implements CategoryService {
 				.map(this::convertToDto)
 				.collect(Collectors.toList());
 	}
-
+	@Override
+	public CategoriesDTO partialUpdate(String storeId, String categoryId, Boolean status) {
+		//Store store = storeRepo.findById(storeId).orElseThrow(() -> new ResourceNotFoundException("Store not found"));
+		Categories existingCategory = categoryRepo.findById(categoryId).orElseThrow(() -> new ResourceNotFoundException("Category not found with given Id"));
+		existingCategory.setActive(status);
+		categoryRepo.save(existingCategory);
+		return convertToDto(existingCategory);
+	}
 	private CategoriesDTO convertToDto(Categories category) {
 		CategoriesDTO dto = new CategoriesDTO();
 		dto.setCategoryId(category.getCategoryId());
@@ -90,6 +97,8 @@ public class CategoryServiceImpl implements CategoryService {
 		dto.setActive(category.isActive());
 		return dto;
 	}
+
+	
 
 	
 }

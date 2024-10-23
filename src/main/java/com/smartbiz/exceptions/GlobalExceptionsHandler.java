@@ -1,9 +1,13 @@
 package com.smartbiz.exceptions;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
@@ -12,7 +16,6 @@ import jakarta.annotation.PostConstruct;
 
 @RestControllerAdvice
 public class GlobalExceptionsHandler {
-
 	@PostConstruct
 	public void init() {
 		System.out.println("GlobalExceptionsHandler initialized");
@@ -46,10 +49,28 @@ public class GlobalExceptionsHandler {
 
 		return new ResponseEntity<>(errorDetails, HttpStatus.FORBIDDEN);
 	}
+
 	@ExceptionHandler(ResourceNotFoundException.class)
-	public ResponseEntity<ApiError> handleResourceNotFoundException(ResourceNotFoundException ex,WebRequest request){
+	public ResponseEntity<ApiError> handleResourceNotFoundException(ResourceNotFoundException ex, WebRequest request) {
 		ApiError errorDetails = new ApiError(new Date(), ex.getMessage(), request.getDescription(false));
-		return new ResponseEntity<>(errorDetails,HttpStatus.BAD_REQUEST);
+		return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
 	}
-	
+
+	@ExceptionHandler(OfferExistsException.class)
+	public ResponseEntity<ApiError> handleOfferExistsException(OfferExistsException ex, WebRequest request) {
+		ApiError errorDetails = new ApiError(new Date(), ex.getMessage(), request.getDescription(false));
+		return new ResponseEntity<>(errorDetails, HttpStatus.CONFLICT);
+	}
+	@ExceptionHandler(MethodArgumentNotValidException.class)
+	public ResponseEntity<Map<String, String>> handleValidationException(MethodArgumentNotValidException ex){
+		Map<String, String> errors = new HashMap<>();
+		ex.getBindingResult().getAllErrors().forEach((error) -> {
+			String fieldName = ((FieldError) error).getField();
+			String errorMsg = error.getDefaultMessage();
+			errors.put(fieldName, errorMsg);
+		});
+		return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+		
+	}
+
 }

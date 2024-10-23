@@ -14,4 +14,6 @@ public interface CategoryService {
 	public List<CategoriesDTO> editCategoy(String categoryId, AddCategory category,String storeId);
 	
 	public List<CategoriesDTO> viewCategory(String storeId);
+
+	public CategoriesDTO partialUpdate(String storeId,String categoryId,Boolean status );
 }

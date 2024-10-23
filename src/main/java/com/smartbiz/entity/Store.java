@@ -53,4 +53,7 @@ public class Store {
 
 	@OneToMany(mappedBy = "store",cascade = CascadeType.ALL)
 	private Set<Categories> category;
+	
+	@OneToMany(mappedBy = "store",cascade = CascadeType.ALL)
+	private Set<Offer> offers;
 }

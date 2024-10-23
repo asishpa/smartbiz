@@ -11,7 +11,7 @@ public class WarehouseDTO {
 	private String warehouseId;
 	private String warehouseName;
 	private String contactPerson;
-	private String mobileNo;
+	private Long mobileNo;
 	private String flatHouseNo;
 	private String areaColony;
 	private Long pinCode;
