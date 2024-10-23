@@ -60,6 +60,12 @@ public class ProductController {
 		List<CategoriesDTO> categories = categoryService.editCategoy(categoryId, updatedCategory, storeId);
 		return new ResponseEntity<>(categories, HttpStatus.OK);
 	}
+	@PatchMapping("/{storeId}/categories/{categoryId}/partial-update")
+	public ResponseEntity<CategoriesDTO> partialUpdate(@PathVariable String storeId,@PathVariable String categoryId,@RequestBody Toggle toggle){
+		CategoriesDTO category = categoryService.partialUpdate(storeId, categoryId, toggle.getIsActive());
+		return new ResponseEntity<>(category,HttpStatus.ACCEPTED);
+		
+	}
 	@PostMapping("/{storeId}/products")
 	public ResponseEntity<List<ProductsDTO>> addProduct(@PathVariable String storeId,@RequestBody AddProduct addProduct){
 		List<ProductsDTO> products = productService.addProduct(storeId, addProduct);
@@ -70,7 +76,7 @@ public class ProductController {
 		List<ProductsDTO> products = productService.getProducts(storeId);
 		return new ResponseEntity<>(products,HttpStatus.OK);
 	}
-	@PatchMapping("/{storeId}/products/{productId}")
+	@PatchMapping("/{storeId}/products/{productId}/partial-update")
 	public ResponseEntity<ProductsDTO> partialUpdateProduct(@PathVariable String storeId,@PathVariable String poductId,@RequestBody Toggle toggle){
 		ProductsDTO product = productService.partialUpdate(storeId, poductId, toggle.getIsActive());
 		return new ResponseEntity<>(product,HttpStatus.ACCEPTED);
