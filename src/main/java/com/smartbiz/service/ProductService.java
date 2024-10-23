@@ -11,4 +11,5 @@ public interface ProductService {
 	public List<ProductsDTO> getProducts(String storeId);
 	public boolean deleteProduct(String storeId,String productId);
 	public ProductsDTO partialUpdate(String storeId,String productId ,Boolean status);
+	public ProductsDTO updateProduct(String storeId,String productId,AddProduct addProduct);
 }

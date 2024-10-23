@@ -123,4 +123,11 @@ public class ProductServiceImpl implements ProductService {
 	    // Return the updated product DTO
 	    return entityMapper.toProductsDTO(product);
 	}
+
+	@Override
+	public ProductsDTO updateProduct(String storeId, String productId, AddProduct addProduct) {
+		Products product = productRepo.findById(productId).orElseThrow(() -> new ResourceNotFoundException("productId does not exist"));
+		//entityMapper.toProductsDTO(product)
+		return null;
+	}
 }

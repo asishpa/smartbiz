@@ -46,7 +46,7 @@ public class CategoryServiceImpl implements CategoryService {
 	}
 
 	@Override
-	public List<CategoriesDTO> deleteCategory(String categoryId,String storeId) {
+	public List<CategoriesDTO> deleteCategory(String storeId,String categoryId) {
 		Store store = storeRepo.findById(storeId).orElseThrow(() -> new ResourceNotFoundException("Store not found"));
 
 		Categories category = categoryRepo.findById(categoryId)
