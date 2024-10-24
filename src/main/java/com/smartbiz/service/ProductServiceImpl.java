@@ -27,6 +27,8 @@ import com.smartbiz.repository.ProductsRepository;
 import com.smartbiz.repository.StoreRepository;
 import com.smartbiz.repository.WarehouseRepository;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class ProductServiceImpl implements ProductService {
 
@@ -78,10 +80,7 @@ public class ProductServiceImpl implements ProductService {
 			inventory.setWarehouse(warehouse);
 			inventory.setQuantity(quantity);
 			inventoryRepo.save(inventory);
-			// Debugging output
-			System.out.println("Saved Inventory for Product ID: " + savedProduct.getId() + " Warehouse ID: "
-					+ warehouseId + " Quantity: " + quantity);
-
+			
 		});
 
 		return productRepo.findByStore(store).stream().map(entityMapper::toProductsDTO).collect(Collectors.toList());
@@ -98,21 +97,36 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	@Override
+	@Transactional
 	public boolean deleteProduct(String storeId, String productId) {
-		// Store store = storeRepo.findById(storeId).orElseThrow(() -> new
-		// ResourceNotFoundException("Store does not exist with the specified
-		// storeId"));
-		Optional<Products> product = productRepo.findByIdAndStoreId(productId, storeId);
-		if (product.isPresent()) {
-			productRepo.deleteByIdAndStoreId(productId, storeId);
+		Products product = productRepo.findById(productId).orElseThrow(() -> new ResourceNotFoundException("Product not found with given Id"));
+		  // Clear associations before deletion
+		Categories category = product.getCategory();
+		Store store = product.getStore();
+		try {
+			category.getProducts().remove(product);
+			store.getProducts().remove(product);
+			if (product.getWarehouseInventories() != null) {
+	            inventoryRepo.deleteAllByProductId(productId);
+	            product.setWarehouseInventories(null);
+	        }
+			if (product.getPhotos() != null) {
+	            productPhotoRepo.deleteAllByProductId(productId);
+	            product.setPhotos(null);
+	        }
+			product.setCategory(null);
+			product.setStore(null);
+			productRepo.delete(product);
+			productRepo.flush();
 			return true;
-		} else {
-			return false;
+		} 
+		catch (Exception e) {
+			throw new RuntimeException("Failed to delete product with ID: " + productId, e);
+        }
 		}
 
-	}
 
-	@Override
+	@Override 
 	public ProductsDTO partialUpdate(String storeId, String productId, Boolean status) {
 		Products product = productRepo.findById(productId)
 				.orElseThrow(() -> new ResourceNotFoundException("productId does not exist"));
@@ -127,9 +141,8 @@ public class ProductServiceImpl implements ProductService {
 
 	@Override
 	public ProductsDTO updateProduct(String storeId, String productId, AddProduct newProduct) {
-		/*Products existingProduct = productRepo.findById(productId).orElseThrow(() -> new ResourceNotFoundException("productId does not exist"));
-		categoryRepo.findById(newProduct.getCategoryId())
-				.orElseThrow(() -> new ResourceNotFoundException("Category does notexist with given id"));
+		Products existingProduct = productRepo.findById(productId).orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+		Categories category = categoryRepo.findById(newProduct.getCategoryId()).orElseThrow(() -> new ResourceNotFoundException("Category not found with given id"));
 		existingProduct.setProductName(newProduct.getProductName());
 		existingProduct.setProductDesc(newProduct.getProductDesc());
 		existingProduct.setActualPrice(newProduct.getActualPrice());
@@ -137,23 +150,29 @@ public class ProductServiceImpl implements ProductService {
 		existingProduct.setCategory(category);
 		existingProduct.setHsnCode(newProduct.getHsnCode());
 		existingProduct.setWeight(newProduct.getWeight());
-
-		existingProduct.setStore(store);
-		List<ProductPhoto> existingPhotos = productPhotoRepo.findByPublicIdIn(addProduct.getPhotoPublicId());
-		existingPhotos.forEach(photo -> photo.setProduct(product)); // Set the product reference
-
-		existingProduct.setPhotos(existingPhotos);
 		Products savedProduct = productRepo.save(existingProduct);
-		newProduct.getInventoryList().forEach((warehouseId, quantity) -> {
+		newProduct.getInventoryList().forEach((warehouseId,quantity) -> {
 			Warehouse warehouse = warehouseRepo.findById(warehouseId)
-					.orElseThrow(() -> new ResourceNotFoundException("warehouse not found"));
+						.orElseThrow(() -> new ResourceNotFoundException("Warehouse not found"));
+		List<ProductWarehouseInventory> existingInventoryList = inventoryRepo.findByProduct(savedProduct);
+		ProductWarehouseInventory existingInventory = existingInventoryList.stream()
+				.filter(inventory -> inventory.getWarehouse().getWarehouseId().equals(warehouseId))
+				.findFirst()
+				.orElse(null);
+		if (existingInventory != null) {
+			existingInventory.setQuantity(quantity);
+			inventoryRepo.save(existingInventory);
+		}
+		else {
 			ProductWarehouseInventory inventory = new ProductWarehouseInventory();
 			inventory.setProduct(savedProduct);
 			inventory.setWarehouse(warehouse);
 			inventory.setQuantity(quantity);
 			inventoryRepo.save(inventory);
-			return entityMapper.toProductsDTO(savedProduct);*/
-			return null;
-	}
+		}
+		
+		});
+			return entityMapper.toProductsDTO(savedProduct);
+		}
 	
 }

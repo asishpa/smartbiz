@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.smartbiz.service.ProductPhotoService;
-import com.smartbiz.service.ProductPhotoServiceImpl;
 
 @RestController
 @RequestMapping("/api/media")

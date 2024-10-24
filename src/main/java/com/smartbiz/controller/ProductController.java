@@ -91,6 +91,10 @@ public class ProductController {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product does not exist");
 		}
 	}
-	
+	@PatchMapping("/{storeId}/products/{productId}")
+	public ResponseEntity<ProductsDTO> updateProduct(@PathVariable String storeId,@PathVariable String productId,@RequestBody AddProduct addProduct){
+		ProductsDTO updatedProduct = productService.updateProduct(storeId, productId, addProduct);
+		return new ResponseEntity<>(updatedProduct,HttpStatus.OK);
+	}
 		
 }
