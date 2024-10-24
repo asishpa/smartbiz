@@ -4,5 +4,5 @@ import lombok.Data;
 
 @Data
 public class Toggle {
-	private Boolean isActive;
+	private Boolean active;
 }

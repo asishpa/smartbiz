@@ -57,7 +57,7 @@ public class SecurityConfig {
 																														// requests
 																														// from
 																														// localhost
-		configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS")); // Specify allowed
+		configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS","PATCH")); // Specify allowed
 																									// methods
 		configuration.setAllowCredentials(true); // Allow cookies to be sent
 		configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type")); // Specify allowed headers

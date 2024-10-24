@@ -114,20 +114,46 @@ public class ProductServiceImpl implements ProductService {
 
 	@Override
 	public ProductsDTO partialUpdate(String storeId, String productId, Boolean status) {
-	    Products product = productRepo.findById(productId).orElseThrow(() -> new ResourceNotFoundException("productId does not exist"));
+		Products product = productRepo.findById(productId)
+				.orElseThrow(() -> new ResourceNotFoundException("productId does not exist"));
 
-	    product.setActive(status);
+		product.setActive(status);
 
-	    productRepo.save(product);
+		productRepo.save(product);
 
-	    // Return the updated product DTO
-	    return entityMapper.toProductsDTO(product);
+		// Return the updated product DTO
+		return entityMapper.toProductsDTO(product);
 	}
 
 	@Override
-	public ProductsDTO updateProduct(String storeId, String productId, AddProduct addProduct) {
-		Products product = productRepo.findById(productId).orElseThrow(() -> new ResourceNotFoundException("productId does not exist"));
-		//entityMapper.toProductsDTO(product)
-		return null;
+	public ProductsDTO updateProduct(String storeId, String productId, AddProduct newProduct) {
+		/*Products existingProduct = productRepo.findById(productId).orElseThrow(() -> new ResourceNotFoundException("productId does not exist"));
+		categoryRepo.findById(newProduct.getCategoryId())
+				.orElseThrow(() -> new ResourceNotFoundException("Category does notexist with given id"));
+		existingProduct.setProductName(newProduct.getProductName());
+		existingProduct.setProductDesc(newProduct.getProductDesc());
+		existingProduct.setActualPrice(newProduct.getActualPrice());
+		existingProduct.setDiscountedPrice(newProduct.getDiscountedPrice());
+		existingProduct.setCategory(category);
+		existingProduct.setHsnCode(newProduct.getHsnCode());
+		existingProduct.setWeight(newProduct.getWeight());
+
+		existingProduct.setStore(store);
+		List<ProductPhoto> existingPhotos = productPhotoRepo.findByPublicIdIn(addProduct.getPhotoPublicId());
+		existingPhotos.forEach(photo -> photo.setProduct(product)); // Set the product reference
+
+		existingProduct.setPhotos(existingPhotos);
+		Products savedProduct = productRepo.save(existingProduct);
+		newProduct.getInventoryList().forEach((warehouseId, quantity) -> {
+			Warehouse warehouse = warehouseRepo.findById(warehouseId)
+					.orElseThrow(() -> new ResourceNotFoundException("warehouse not found"));
+			ProductWarehouseInventory inventory = new ProductWarehouseInventory();
+			inventory.setProduct(savedProduct);
+			inventory.setWarehouse(warehouse);
+			inventory.setQuantity(quantity);
+			inventoryRepo.save(inventory);
+			return entityMapper.toProductsDTO(savedProduct);*/
+			return null;
 	}
+	
 }
