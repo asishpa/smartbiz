@@ -36,7 +36,7 @@ public class CategoryServiceImpl implements CategoryService {
 		System.out.println("get category name"+addCategory.getCategoryName());
 		category.setCategoryName(addCategory.getCategoryName());
 		category.setDescription(addCategory.getDescription());
-		category.setActive(true);
+		category.setActive(addCategory.isActive());
 		category.setStore(store);
 		categoryRepo.save(category);
 		return categoryRepo.findByStore(store)
