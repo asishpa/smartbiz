@@ -55,9 +55,9 @@ public class ProductController {
 	}
 
 	@PatchMapping("/{storeId}/categories/{categoryId}")
-	public ResponseEntity<List<CategoriesDTO>> editCategory(@PathVariable String categoryId,
-			@RequestBody AddCategory updatedCategory, @PathVariable String storeId) {
-		List<CategoriesDTO> categories = categoryService.editCategoy(categoryId, updatedCategory, storeId);
+	public ResponseEntity<List<CategoriesDTO>> editCategory(@PathVariable String storeId,
+			 @PathVariable String categoryId,@RequestBody AddCategory updatedCategory) {
+		List<CategoriesDTO> categories = categoryService.editCategoy(storeId,categoryId, updatedCategory);
 		return new ResponseEntity<>(categories, HttpStatus.OK);
 	}
 	@PatchMapping("/{storeId}/categories/{categoryId}/partial-update")

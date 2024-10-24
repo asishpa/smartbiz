@@ -59,7 +59,7 @@ public class CategoryServiceImpl implements CategoryService {
 		}
 
 	@Override
-	public List<CategoriesDTO> editCategoy(String categoryId, AddCategory updatedCategory,String storeId) {
+	public List<CategoriesDTO> editCategoy(String storeId,String categoryId, AddCategory updatedCategory) {
 		Store store = storeRepo.findById(storeId).orElseThrow(() -> new ResourceNotFoundException("Store not found"));
 		Categories existingCategory = categoryRepo.findById(categoryId)
 				.orElseThrow(() -> new ResourceNotFoundException("Category not found with given Id"));
