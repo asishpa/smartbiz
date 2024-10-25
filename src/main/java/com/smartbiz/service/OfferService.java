@@ -7,5 +7,6 @@ public interface OfferService {
 
 	void validateOffer(String storeId, OfferValidationRequest request);
 	String createOffer(String storeId,AddOffer offer);
+	boolean deleteOffer(String storeId,String offerId);
 }
 	

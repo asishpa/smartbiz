@@ -33,6 +33,11 @@ public class Store {
 	private String id;
 	
 	private String name;
+	private String storeLink;
+	private Long mobileNo;
+	private String country;
+	private String storeAddress;
+	
 	
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name="owner_id",nullable = false)

@@ -31,7 +31,8 @@ public class ProductPhotoServiceImpl implements ProductPhotoService{
                     ? fullPublicId.substring(fullPublicId.lastIndexOf("/") + 1) 
                     : fullPublicId;
             
-			String imageUrl = cloudinary.url().secure(true).generate(publicId);
+            String imageUrl = cloudinary.url().secure(true).generate("product/" + publicId);
+			System.out.println(imageUrl);
 			//save to db
 			ProductPhoto photo = new ProductPhoto();
 			//photo.setUrl(imageUrl);

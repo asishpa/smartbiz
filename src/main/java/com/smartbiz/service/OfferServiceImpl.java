@@ -71,4 +71,20 @@ public class OfferServiceImpl implements OfferService {
 		return newOffer.getId();
 	}
 
+	@Override
+	public boolean deleteOffer(String storeId, String offerId) {
+		Offer offer = offerRepo.findById(offerId).orElseThrow(() -> new ResourceNotFoundException("Offer not found with given Id Id"));
+		try {
+			Store store = offer.getStore();
+			if (store!=null && store.getOffers() != null) {
+					store.getOffers().remove(offer);
+			}
+			offerRepo.delete(offer);
+			return true;
+		} catch (Exception e) {
+			throw new RuntimeException("Failed to delete offer");
+		}
+	}
+	
+
 }
