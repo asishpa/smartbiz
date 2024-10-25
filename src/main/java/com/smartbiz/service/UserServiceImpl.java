@@ -28,7 +28,7 @@ import com.smartbiz.security.JwtHelper;
 @Service
 public class UserServiceImpl implements UserService {
 
-	 private static final Random RANDOM = new Random();
+	private static final Random RANDOM = new Random();
 	@Autowired
 	private JwtHelper jwtHelper;
 	@Autowired
@@ -39,10 +39,9 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
-	
+
 	@Autowired
 	private StoreRepository storeRepo;
-
 
 	@Override
 	@Transactional
@@ -54,7 +53,7 @@ public class UserServiceImpl implements UserService {
 
 		User user = new User();
 		user.setUserName(request.getName());
-		user.setEmail(request.getEmail()); 
+		user.setEmail(request.getEmail());
 		user.setEmailVerified(false);
 		user.setPassword(passwordEncoder.encode(request.getPassword()));
 
@@ -80,37 +79,38 @@ public class UserServiceImpl implements UserService {
 	@Override
 	@Transactional(readOnly = true)
 	public Map<String, Object> sellerLogin(LoginSeller request) {
-	    Map<String, Object> response = new HashMap<>();
-	    User user = userRepo.findByEmail(request.getEmail()).orElseThrow(() -> new InvalidCredentialsException(AppConstants.INVALID_CRED));
-	    System.out.println(user);
-	    if(!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-	    	throw new InvalidCredentialsException(AppConstants.INVALID_CRED);
-	    }
-	    List<String> roles = userRepo.findRoleNamesByEmail(request.getEmail());
-	    if (!roles.contains("STORE_OWNER")) {
-	    	throw new UnauthorizedAccessException(AppConstants.ERROR_UNAUTHORIZED_ACCESS);
+		Map<String, Object> response = new HashMap<>();
+		User user = userRepo.findByEmail(request.getEmail())
+				.orElseThrow(() -> new InvalidCredentialsException(AppConstants.INVALID_CRED));
+		System.out.println(user);
+		if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+			throw new InvalidCredentialsException(AppConstants.INVALID_CRED);
 		}
-	    String token = jwtHelper.generateToken(user.getEmail(), roles.get(0), String.valueOf(user.getUserId())); 
-	    System.out.println("entered");
-	    response.put("status", AppConstants.SUCCESS);
-	    response.put("token", token);
-	    response.put("roles", roles);
-	    response.put("owner_name", user.getUserName());
-	    response.put("store_name", user.getStore().getName());
-	    response.put("store_id", user.getStore().getId());
-	    return response;
+		List<String> roles = userRepo.findRoleNamesByEmail(request.getEmail());
+		if (!roles.contains("STORE_OWNER")) {
+			throw new UnauthorizedAccessException(AppConstants.ERROR_UNAUTHORIZED_ACCESS);
+		}
+		String token = jwtHelper.generateToken(user.getEmail(), roles.get(0), String.valueOf(user.getUserId()));
+		System.out.println("entered");
+		response.put("status", AppConstants.SUCCESS);
+		response.put("token", token);
+		response.put("roles", roles);
+		response.put("owner_name", user.getUserName());
+		response.put("store_name", user.getStore().getName());
+		response.put("store_id", user.getStore().getId());
+		return response;
 	}
+
 	private String generateUniqueStoreLink(String storeName) {
-        String baseLink = storeName.replaceAll("\\s+", "").toLowerCase();
-        String storeLink = baseLink;
+		String baseLink = storeName.replaceAll("\\s+", "").toLowerCase();
+		String storeLink = baseLink;
 
-        while (storeRepo.findByStoreLink(storeLink).isPresent()) {
-            // Append a random number and recheck
-            int randomNumber = 1000 + RANDOM.nextInt(900);
-            storeLink = baseLink + randomNumber;
-        }
-        return storeLink;
-    }
-
+		while (storeRepo.findByStoreLink(storeLink).isPresent()) {
+			// Append a random number and recheck
+			int randomNumber = 1000 + RANDOM.nextInt(900);
+			storeLink = baseLink + randomNumber;
+		}
+		return storeLink;
+	}
 
 }
