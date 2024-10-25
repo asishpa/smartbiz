@@ -31,5 +31,6 @@ public class OfferController {
 		response.put("msg", "Offer is valid");
 		return new ResponseEntity<>(response,HttpStatus.ACCEPTED);
 	}
+	
 
 }

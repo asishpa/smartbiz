@@ -39,7 +39,7 @@ public class SecurityConfig {
 		http.cors(cors -> cors.configurationSource(corsConfigurationSource())).csrf(AbstractHttpConfigurer::disable)
 				.authorizeHttpRequests(requests -> requests.requestMatchers("/api/auth/**").permitAll()
 						.requestMatchers("/api-docs/**").permitAll().requestMatchers("/swagger-ui/**").permitAll()
-						.requestMatchers("/api/media/**").permitAll().anyRequest().authenticated())
+						.requestMatchers("/api/media/**").permitAll())
 				.exceptionHandling(ex -> ex.authenticationEntryPoint(entryPoint))
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
