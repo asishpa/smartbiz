@@ -2,7 +2,6 @@ package com.smartbiz.dto;
 
 import java.math.BigDecimal;
 
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;

@@ -8,11 +8,13 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 import org.mapstruct.Named;
 
+import com.smartbiz.dto.OfferDTO;
 import com.smartbiz.dto.ProductWarehouseDTO;
 import com.smartbiz.dto.ProductsDTO;
 import com.smartbiz.dto.StoreDTO;
 import com.smartbiz.dto.WarehouseDTO;
 import com.smartbiz.dto.WarehouseInventoryDTO;
+import com.smartbiz.entity.Offer;
 import com.smartbiz.entity.ProductPhoto;
 import com.smartbiz.entity.ProductWarehouseInventory;
 import com.smartbiz.entity.Products;
@@ -39,6 +41,8 @@ public interface EntityMapper {
 	List<ProductWarehouseDTO> toProductWarehouseDTOs(List<ProductWarehouseInventory> inventories);
 
 	StoreDTO toStoreDTO(Store store);
+	
+	List<OfferDTO> toOfferDTO(List<Offer> offer);
 	
 	@Named("mapPhotosToPublicIds")
 	 static List<String> mapPhotosToPublicIds(List<ProductPhoto> photos) {

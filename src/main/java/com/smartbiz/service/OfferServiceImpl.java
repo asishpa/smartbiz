@@ -1,12 +1,17 @@
 package com.smartbiz.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.smartbiz.constants.AppConstants;
+import com.smartbiz.dto.OfferDTO;
 import com.smartbiz.entity.Offer;
 import com.smartbiz.entity.Store;
 import com.smartbiz.exceptions.OfferExistsException;
 import com.smartbiz.exceptions.ResourceNotFoundException;
+import com.smartbiz.mapper.EntityMapper;
 import com.smartbiz.model.AddOffer;
 import com.smartbiz.model.OfferValidationRequest;
 import com.smartbiz.repository.OfferRepository;
@@ -22,6 +27,9 @@ public class OfferServiceImpl implements OfferService {
 
 	@Autowired
 	private StoreRepository storeRepo;
+	
+	@Autowired
+	private EntityMapper entityMapper;
 
 	@Override
 	public void validateOffer(String storeId, OfferValidationRequest request) {
@@ -84,6 +92,13 @@ public class OfferServiceImpl implements OfferService {
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to delete offer");
 		}
+	}
+
+	@Override
+	public List<OfferDTO> getOffers(String storeId) {
+		Store store =storeRepo.findById(storeId).orElseThrow(() -> new RuntimeException(AppConstants.ERROR_STORE_NOT_FOUND));
+		List<Offer> offers = offerRepo.findByStore(store);
+		return entityMapper.toOfferDTO(offers);
 	}
 	
 
