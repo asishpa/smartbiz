@@ -53,6 +53,7 @@ public class ProductServiceImpl implements ProductService {
 	private EntityMapper entityMapper;
 
 	@Override
+	@Transactional
 	public List<ProductsDTO> addProduct(String storeId, AddProduct addProduct) {
 		Store store = storeRepo.findById(storeId).orElseThrow(() -> new ResourceNotFoundException("Store not found"));
 		Categories category = categoryRepo.findById(addProduct.getCategoryId())
@@ -65,7 +66,7 @@ public class ProductServiceImpl implements ProductService {
 		product.setCategory(category);
 		product.setHsnCode(addProduct.getHsnCode());
 		product.setWeight(addProduct.getWeight());
-
+		product.setActive(true);
 		product.setStore(store);
 		List<ProductPhoto> existingPhotos = productPhotoRepo.findByPublicIdIn(addProduct.getPhotoPublicId());
 		existingPhotos.forEach(photo -> photo.setProduct(product)); // Set the product reference
@@ -80,7 +81,7 @@ public class ProductServiceImpl implements ProductService {
 			inventory.setWarehouse(warehouse);
 			inventory.setQuantity(quantity);
 			inventoryRepo.save(inventory);
-			
+			 inventoryRepo.flush();
 		});
 
 		return productRepo.findByStore(store).stream().map(entityMapper::toProductsDTO).collect(Collectors.toList());

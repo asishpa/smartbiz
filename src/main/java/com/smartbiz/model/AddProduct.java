@@ -16,6 +16,6 @@ public class AddProduct {
 	private Float weight;
 	private String hsnCode;
 	private String productDesc;
-	private boolean isActive;
+	private boolean active;
 
 }

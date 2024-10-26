@@ -77,8 +77,8 @@ public class ProductController {
 		return new ResponseEntity<>(products,HttpStatus.OK);
 	}
 	@PatchMapping("/{storeId}/products/{productId}/partial-update")
-	public ResponseEntity<ProductsDTO> partialUpdateProduct(@PathVariable String storeId,@PathVariable String poductId,@RequestBody Toggle toggle){
-		ProductsDTO product = productService.partialUpdate(storeId, poductId, toggle.getActive());
+	public ResponseEntity<ProductsDTO> partialUpdateProduct(@PathVariable String storeId,@PathVariable String productId,@RequestBody Toggle toggle){
+		ProductsDTO product = productService.partialUpdate(storeId,productId , toggle.getActive());
 		return new ResponseEntity<>(product,HttpStatus.ACCEPTED);
 	}
 	@DeleteMapping("/{storeId}/products/{productId}")

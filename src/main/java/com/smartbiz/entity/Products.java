@@ -36,7 +36,7 @@ public class Products {
 	private Float discountedPrice;
 	private Float weight;
 	private String hsnCode;
-	private boolean isActive;
+	private boolean active;
 	
 	
 	@OneToMany(mappedBy = "product",cascade = CascadeType.ALL,orphanRemoval = true)
