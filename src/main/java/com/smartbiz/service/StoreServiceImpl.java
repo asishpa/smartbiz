@@ -8,6 +8,7 @@ import com.smartbiz.dto.StoreDTO;
 import com.smartbiz.entity.Store;
 import com.smartbiz.exceptions.ResourceNotFoundException;
 import com.smartbiz.mapper.EntityMapper;
+import com.smartbiz.model.StoreMetadata;
 import com.smartbiz.repository.StoreRepository;
 
 import jakarta.persistence.EntityManager;
@@ -24,6 +25,16 @@ public class StoreServiceImpl implements StoreService {
 	public StoreDTO getStoreMetadata(String storeId) {
 		Store store = storeRepo.findById(storeId).orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_STORE_NOT_FOUND));
 		return entityMapper.toStoreDTO(store);
+	}
+	public StoreDTO updateStoreMetadata(String storeId,StoreMetadata newMetadata) {
+		Store existingMetadata = storeRepo.findById(storeId).orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_STORE_NOT_FOUND));
+		existingMetadata.setName(newMetadata.getName());
+		existingMetadata.setStoreLink(newMetadata.getStoreLink());
+		existingMetadata.setMobileNo(newMetadata.getMobileNo());
+		existingMetadata.setCountry(newMetadata.getCountry());
+		existingMetadata.setStoreAddress(newMetadata.getStoreAddress());
+		storeRepo.save(existingMetadata);
+		return entityMapper.toStoreDTO(existingMetadata);
 	}
 	
 }

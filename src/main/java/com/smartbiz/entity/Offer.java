@@ -35,7 +35,7 @@ public class Offer {
 	private String offerName;
 	@Column(nullable = false,length = 17,unique = true)
 	private String offerCode;
-	private boolean isActive;
+	private boolean active;
 	@DecimalMin(value = "0.0",inclusive = true,message = "Percentage value must be at least 0")
 	@DecimalMax(value = "100.0",inclusive = true,message = "Percentage value cannot exceed 100")
 	@Digits(integer = 3,fraction = 2,message = "Percentage value must have at most 3 integer digits and 2 decimal places")

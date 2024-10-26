@@ -25,7 +25,6 @@ import com.smartbiz.model.Toggle;
 import com.smartbiz.service.CategoryService;
 import com.smartbiz.service.ProductService;
 
-
 @RestController
 @CrossOrigin
 @RequestMapping("/api/stores/")
@@ -35,66 +34,78 @@ public class ProductController {
 
 	@Autowired
 	private ProductService productService;
+
 	@GetMapping("/{storeId}/categories")
-	public ResponseEntity<List<CategoriesDTO>> viewCategory(@PathVariable String storeId){
+	public ResponseEntity<List<CategoriesDTO>> viewCategory(@PathVariable String storeId) {
 		List<CategoriesDTO> categories = categoryService.viewCategory(storeId);
-		return new ResponseEntity<>(categories,HttpStatus.OK);
+		return new ResponseEntity<>(categories, HttpStatus.OK);
 	}
-	
+
 	@PostMapping("/{storeId}/categories")
-	public ResponseEntity<List<CategoriesDTO>> addCategory(@RequestBody AddCategory addCategory,@PathVariable String storeId) {
+	public ResponseEntity<List<CategoriesDTO>> addCategory(@RequestBody AddCategory addCategory,
+			@PathVariable String storeId) {
 		List<CategoriesDTO> categories = categoryService.addCategory(storeId, addCategory);
 		return new ResponseEntity<>(categories, HttpStatus.CREATED);
 	}
 
 	@DeleteMapping("/{storeId}/categories/{categoryId}")
-	public ResponseEntity<List<CategoriesDTO>> deleteCategory(@PathVariable String storeId, @PathVariable String categoryId) {
+	public ResponseEntity<List<CategoriesDTO>> deleteCategory(@PathVariable String storeId,
+			@PathVariable String categoryId) {
 		List<CategoriesDTO> categories = categoryService.deleteCategory(storeId, categoryId);
-		return new ResponseEntity<List<CategoriesDTO>>(categories,HttpStatus.ACCEPTED);
+		return new ResponseEntity<List<CategoriesDTO>>(categories, HttpStatus.ACCEPTED);
 
 	}
 
 	@PatchMapping("/{storeId}/categories/{categoryId}")
 	public ResponseEntity<List<CategoriesDTO>> editCategory(@PathVariable String storeId,
-			 @PathVariable String categoryId,@RequestBody AddCategory updatedCategory) {
-		List<CategoriesDTO> categories = categoryService.editCategoy(storeId,categoryId, updatedCategory);
+			@PathVariable String categoryId, @RequestBody AddCategory updatedCategory) {
+		List<CategoriesDTO> categories = categoryService.editCategoy(storeId, categoryId, updatedCategory);
 		return new ResponseEntity<>(categories, HttpStatus.OK);
 	}
+
 	@PatchMapping("/{storeId}/categories/{categoryId}/partial-update")
-	public ResponseEntity<CategoriesDTO> partialUpdate(@PathVariable String storeId,@PathVariable String categoryId,@RequestBody Toggle toggle){
+	public ResponseEntity<CategoriesDTO> partialUpdate(@PathVariable String storeId, @PathVariable String categoryId,
+			@RequestBody Toggle toggle) {
 		CategoriesDTO category = categoryService.partialUpdate(storeId, categoryId, toggle.getActive());
-		return new ResponseEntity<>(category,HttpStatus.ACCEPTED);
-		
+		return new ResponseEntity<>(category, HttpStatus.ACCEPTED);
+
 	}
+
 	@PostMapping("/{storeId}/products")
-	public ResponseEntity<List<ProductsDTO>> addProduct(@PathVariable String storeId,@RequestBody AddProduct addProduct){
+	public ResponseEntity<List<ProductsDTO>> addProduct(@PathVariable String storeId,
+			@RequestBody AddProduct addProduct) {
 		List<ProductsDTO> products = productService.addProduct(storeId, addProduct);
-		return new ResponseEntity<>(products,HttpStatus.CREATED)
-;	}
+		return new ResponseEntity<>(products, HttpStatus.CREATED);
+	}
+
 	@GetMapping("/{storeId}/products")
-	public ResponseEntity<List<ProductsDTO>> getProduct(@PathVariable String storeId){
+	public ResponseEntity<List<ProductsDTO>> getProduct(@PathVariable String storeId) {
 		List<ProductsDTO> products = productService.getProducts(storeId);
-		return new ResponseEntity<>(products,HttpStatus.OK);
+		return new ResponseEntity<>(products, HttpStatus.OK);
 	}
+
 	@PatchMapping("/{storeId}/products/{productId}/partial-update")
-	public ResponseEntity<ProductsDTO> partialUpdateProduct(@PathVariable String storeId,@PathVariable String productId,@RequestBody Toggle toggle){
-		ProductsDTO product = productService.partialUpdate(storeId,productId , toggle.getActive());
-		return new ResponseEntity<>(product,HttpStatus.ACCEPTED);
+	public ResponseEntity<ProductsDTO> partialUpdateProduct(@PathVariable String storeId,
+			@PathVariable String productId, @RequestBody Toggle toggle) {
+		ProductsDTO product = productService.partialUpdate(storeId, productId, toggle.getActive());
+		return new ResponseEntity<>(product, HttpStatus.ACCEPTED);
 	}
+
 	@DeleteMapping("/{storeId}/products/{productId}")
-	public ResponseEntity<String> deleteProduct(@PathVariable String storeId,@PathVariable String productId){
+	public ResponseEntity<String> deleteProduct(@PathVariable String storeId, @PathVariable String productId) {
 		boolean isDeleted = productService.deleteProduct(storeId, productId);
 		if (isDeleted) {
 			return ResponseEntity.ok("Product deleted successfully");
-		}
-		else {
+		} else {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product does not exist");
 		}
 	}
+
 	@PatchMapping("/{storeId}/products/{productId}")
-	public ResponseEntity<ProductsDTO> updateProduct(@PathVariable String storeId,@PathVariable String productId,@RequestBody AddProduct addProduct){
+	public ResponseEntity<ProductsDTO> updateProduct(@PathVariable String storeId, @PathVariable String productId,
+			@RequestBody AddProduct addProduct) {
 		ProductsDTO updatedProduct = productService.updateProduct(storeId, productId, addProduct);
-		return new ResponseEntity<>(updatedProduct,HttpStatus.OK);
+		return new ResponseEntity<>(updatedProduct, HttpStatus.OK);
 	}
-		
+
 }
