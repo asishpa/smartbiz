@@ -36,7 +36,7 @@ public class ProductController {
 	@Autowired
 	private ProductService productService;
 
-	@GetMapping("/{storeId}/categories")
+	@GetMapping("/public/{storeId}/categories")
 	@PublicEndpoint
 	public ResponseEntity<List<CategoriesDTO>> viewCategory(@PathVariable String storeId) {
 		List<CategoriesDTO> categories = categoryService.viewCategory(storeId);
@@ -80,7 +80,7 @@ public class ProductController {
 		return new ResponseEntity<>(products, HttpStatus.CREATED);
 	}
 
-	@GetMapping("/{storeId}/products")
+	@GetMapping("/public/{storeId}/products")
 	@PublicEndpoint
 	public ResponseEntity<List<ProductsDTO>> getProduct(@PathVariable String storeId) {
 		List<ProductsDTO> products = productService.getProducts(storeId);
