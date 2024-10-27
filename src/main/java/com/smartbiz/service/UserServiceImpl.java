@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -12,13 +13,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.smartbiz.constants.AppConstants;
 import com.smartbiz.entity.Role;
+import com.smartbiz.entity.Role.RoleName;
 import com.smartbiz.entity.Store;
 import com.smartbiz.entity.User;
 import com.smartbiz.exceptions.InvalidCredentialsException;
 import com.smartbiz.exceptions.RoleNotFoundException;
 import com.smartbiz.exceptions.UnauthorizedAccessException;
 import com.smartbiz.exceptions.UserExistsException;
-import com.smartbiz.model.LoginSeller;
+import com.smartbiz.model.LoginRequest;
+import com.smartbiz.model.RegisterBuyer;
 import com.smartbiz.model.RegisterSeller;
 import com.smartbiz.repository.RoleRepository;
 import com.smartbiz.repository.StoreRepository;
@@ -57,7 +60,7 @@ public class UserServiceImpl implements UserService {
 		user.setEmailVerified(false);
 		user.setPassword(passwordEncoder.encode(request.getPassword()));
 
-		Role storeOwnerRole = roleRepo.findByRoleName("STORE_OWNER")
+		Role storeOwnerRole = roleRepo.findByRoleName(RoleName.STORE_OWNER)
 				.orElseThrow(() -> new RoleNotFoundException(AppConstants.ERROR_ROLE_NOT_FOUND));
 		user.getRoles().add(storeOwnerRole);
 
@@ -78,7 +81,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public Map<String, Object> sellerLogin(LoginSeller request) {
+	public Map<String, Object> sellerLogin(LoginRequest request) {
 		Map<String, Object> response = new HashMap<>();
 		User user = userRepo.findByEmail(request.getEmail())
 				.orElseThrow(() -> new InvalidCredentialsException(AppConstants.INVALID_CRED));
@@ -88,7 +91,7 @@ public class UserServiceImpl implements UserService {
 		}
 		List<String> roles = userRepo.findRoleNamesByEmail(request.getEmail());
 		if (!roles.contains("STORE_OWNER")) {
-			throw new UnauthorizedAccessException(AppConstants.ERROR_UNAUTHORIZED_ACCESS);
+			throw new UnauthorizedAccessException(AppConstants.ERROR_UNAUTHORIZED_ACCESS_SELLER);
 		}
 		String token = jwtHelper.generateToken(user.getEmail(), roles.get(0), String.valueOf(user.getUserId()));
 		System.out.println("entered");
@@ -113,4 +116,57 @@ public class UserServiceImpl implements UserService {
 		return storeLink;
 	}
 
-}
+	@Override
+	public boolean buyerSignup(RegisterBuyer buyer) {
+		User user = userRepo.findByEmail(buyer.getEmail()).orElse(null);
+		if (user!= null) {
+			boolean isBuyer = user.getRoles().stream()
+			.anyMatch(role -> role.getRoleName().equals(Role.RoleName.BUYER));
+			if (isBuyer) {
+				throw new UserExistsException(AppConstants.ERROR_USER_EXISTS);
+			}
+			Role buyerRole = roleRepo.findByRoleName(Role.RoleName.BUYER)
+				.orElseThrow(() -> new RoleNotFoundException(AppConstants.ERROR_ROLE_NOT_FOUND));
+			user.getRoles().add(buyerRole);
+			userRepo.save(user);
+		}
+		else {
+			user  = new User();
+			user.setUserName(buyer.getName());
+			user.setEmail(buyer.getEmail());
+			user.setEmailVerified(false);
+			user.setPassword(passwordEncoder.encode(buyer.getPassword()));
+			Role buyerRole = roleRepo.findByRoleName(Role.RoleName.BUYER)
+					.orElseThrow(() -> new RoleNotFoundException(AppConstants.ERROR_ROLE_NOT_FOUND));
+			user.getRoles().add(buyerRole);
+			userRepo.save(user);
+			
+		}
+			return true;
+		}
+
+	@Override
+	public Map<String, Object> buyerLogin(LoginRequest request) {
+		Map<String, Object> response = new HashMap<>();
+		User user = userRepo.findByEmail(request.getEmail()).orElseThrow(() -> new InvalidCredentialsException(AppConstants.INVALID_CRED));
+		
+		if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+			throw new InvalidCredentialsException(AppConstants.INVALID_CRED);
+		}
+		List<String> roles = userRepo.findRoleNamesByEmail(request.getEmail());
+
+	    // Check for the "BUYER" role
+	    if (!roles.contains("BUYER")) {
+	        throw new UnauthorizedAccessException(AppConstants.ERROR_UNAUTHORIZED_ACCESS_BUYER);
+	    }
+		String token = jwtHelper.generateToken(user.getEmail(), "BUYER",String.valueOf(user.getUserId()));
+		response.put("status", AppConstants.SUCCESS);
+		response.put("token", token);
+		response.put("roles", List.of("BUYER"));
+		response.put("name", user.getUserName());
+		
+		return response;
+	}
+		
+	}
+

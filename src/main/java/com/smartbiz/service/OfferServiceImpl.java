@@ -1,6 +1,7 @@
 package com.smartbiz.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -48,35 +49,31 @@ public class OfferServiceImpl implements OfferService {
 		Store store = storeRepo.findById(storeId)
 				.orElseThrow(() -> new ResourceNotFoundException("Store does not exist with given ID"));
 		Offer offer = new Offer();
-		if (offer.getOfferType().equals("PERCENTAGE_DISCOUNT")) {
-			offer.setOfferName(addOffer.getOfferName());
-			offer.setOfferCode(addOffer.getOfferCode());
-			offer.setOfferType(addOffer.getOfferType());
-			offer.setVisibilityType(addOffer.getVisibilityType());
-			offer.setPercentageValue(addOffer.getPercentageValue());
-			offer.setMinimumPurchaseAmount(addOffer.getMinimumPurchaseAmount());
-			offer.setMaximumDiscountAmount(addOffer.getMaximumDiscountAmount());
-			offer.setUsageType(addOffer.getUsageType());
-			offer.setStartDate(addOffer.getStartDate());
-			offer.setEndDate(addOffer.getEndDate());
-			offer.setCustomerType(addOffer.getCustomerType());
-			offer.setStore(store);
+		 offer.setOfferName(addOffer.getOfferName());
+		    offer.setOfferCode(addOffer.getOfferCode());
+		    offer.setVisibilityType(addOffer.getVisibilityType());
+		    offer.setMinimumPurchaseAmount(addOffer.getMinimumPurchaseAmount());
+		    offer.setStartDate(addOffer.getStartDate());
+		    offer.setEndDate(addOffer.getEndDate());
+		    offer.setCustomerType(addOffer.getCustomerType());
+		    offer.setStore(store);
 
-		} else {
-			offer.setOfferName(addOffer.getOfferName());
-			offer.setVisibilityType(addOffer.getVisibilityType());
-			offer.setOfferCode(addOffer.getOfferCode());
-			offer.setFlatAmountValue(addOffer.getFlatAmountValue());
-			offer.setMinimumPurchaseAmount(addOffer.getMinimumPurchaseAmount());
-			offer.setUsageType(addOffer.getUsageType());
-			offer.setStartDate(addOffer.getStartDate());
-			offer.setEndDate(addOffer.getEndDate());
-			offer.setCustomerType(addOffer.getCustomerType());
-			offer.setStore(store);
+		    // Set offer type specific fields
+		    if (addOffer.getOfferType().equals(Offer.OfferType.PERCENTAGE_DISCOUNT)) {
+		        offer.setOfferType(addOffer.getOfferType());
+		        offer.setPercentageValue(addOffer.getPercentageValue());
+		    } else {
+		        offer.setOfferType(addOffer.getOfferType());
+		        offer.setFlatAmountValue(addOffer.getFlatAmountValue());
+		    }
 
-		}
-		Offer newOffer = offerRepo.save(offer);
-		return newOffer.getId();
+		    // Set usage limit if usage type is CUSTOM
+		    if (addOffer.getUsageType().equals(Offer.UsageType.CUSTOM)) {
+		        offer.setUsageLimit(addOffer.getUsageLimit()); // Ensure this is handled in your AddOffer model
+		    }
+
+		    Offer newOffer = offerRepo.save(offer);
+		    return newOffer.getId();
 	}
 
 	@Override
@@ -99,6 +96,19 @@ public class OfferServiceImpl implements OfferService {
 		Store store =storeRepo.findById(storeId).orElseThrow(() -> new RuntimeException(AppConstants.ERROR_STORE_NOT_FOUND));
 		List<Offer> offers = offerRepo.findByStore(store);
 		return entityMapper.toOfferDTO(offers);
+	}
+
+	@Override
+	public List<OfferDTO> getVisibleOffers(String storeId) {
+		Store store = storeRepo.findById(storeId)
+	            .orElseThrow(() -> new RuntimeException(AppConstants.ERROR_STORE_NOT_FOUND));
+	    List<Offer> offers = offerRepo.findByStore(store);
+	    
+	    // Correctly mapping List<Offer> to List<OfferDTO>
+	    return offers.stream()
+                .filter(offer -> offer.getVisibilityType() == Offer.VisibilityType.VISIBLE_ON_STORE)
+                .map(entityMapper::toOfferDTO)
+                .collect(Collectors.toList());
 	}
 	
 

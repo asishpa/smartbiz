@@ -25,7 +25,9 @@ public class SellerAuthorizationAspect {
 	@Pointcut("execution(* com.smartbiz.service..*(String, ..)) && args(storeId,..)")
 	public void storeOperation(String storeId) {}
 	
-	 @Before("storeOperation(storeId)")
+	@Pointcut("@annotation(com.smartbiz.annotations.PublicEndpoint)")
+    public void publicEndpoint() {}
+	@Before("storeOperation(storeId)")
 	    public void checkStoreOwnership(String storeId) {
 	        String authenticatedUserId = securityUtil.getAuthenticatedUserId();
 	        Store store = storeRepo.findById(storeId).orElseThrow(() -> new ResourceNotFoundException("Store not found"));

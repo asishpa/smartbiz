@@ -79,7 +79,7 @@ public class User {
     // Convert roles to authorities
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles.stream()
-            .map(role -> new SimpleGrantedAuthority(role.getRoleName()))
+            .map(role -> new SimpleGrantedAuthority(role.getRoleName().name()))
             .collect(Collectors.toSet());
     }
     

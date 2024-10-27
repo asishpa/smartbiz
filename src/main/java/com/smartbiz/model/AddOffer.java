@@ -39,6 +39,7 @@ public class AddOffer {
 	@FutureOrPresent(message = "start Date cannot be in the past")
 	private LocalDate startDate;
 	private LocalDate endDate;
+	private Integer usageLimit;
 
     @NotNull(message = "Visibility type is required")
     private VisibilityType visibilityType;

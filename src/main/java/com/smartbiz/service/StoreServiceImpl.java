@@ -11,8 +11,6 @@ import com.smartbiz.mapper.EntityMapper;
 import com.smartbiz.model.StoreMetadata;
 import com.smartbiz.repository.StoreRepository;
 
-import jakarta.persistence.EntityManager;
-
 @Service
 public class StoreServiceImpl implements StoreService {
 
@@ -35,6 +33,11 @@ public class StoreServiceImpl implements StoreService {
 		existingMetadata.setStoreAddress(newMetadata.getStoreAddress());
 		storeRepo.save(existingMetadata);
 		return entityMapper.toStoreDTO(existingMetadata);
+	}
+	@Override
+	public StoreDTO getStoreMetadataByStoreName(String storeName) {
+		Store store = storeRepo.findByName(storeName).orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_STORE_NOT_FOUND));
+		return entityMapper.toStoreDTO(store);
 	}
 	
 }

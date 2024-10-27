@@ -65,6 +65,8 @@ public class Offer {
 	private LocalDate startDate;
 	
 	private LocalDate endDate;
+	@Column(nullable = true)
+	private Integer usageLimit;
 	@CreationTimestamp
 	private LocalDateTime createdAt;
 	@UpdateTimestamp

@@ -40,6 +40,7 @@ public class SecurityConfig {
 				.authorizeHttpRequests(requests -> requests.requestMatchers("/api/auth/**").permitAll()
 						.requestMatchers("/api-docs/**").permitAll().requestMatchers("/swagger-ui/**").permitAll()
 						.requestMatchers("/api/media/**").permitAll()
+						.requestMatchers("/api/stores/public/**").permitAll()
 						.anyRequest().authenticated())
 				.exceptionHandling(ex -> ex.authenticationEntryPoint(entryPoint))
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));

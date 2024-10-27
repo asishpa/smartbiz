@@ -12,5 +12,6 @@ public interface OfferService {
 	String createOffer(String storeId,AddOffer offer);
 	List<OfferDTO> getOffers(String storeId);
 	boolean deleteOffer(String storeId,String offerId);
+	List<OfferDTO> getVisibleOffers(String storeId);
 }
 	

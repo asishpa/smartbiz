@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.smartbiz.annotation.PublicEndpoint;
 import com.smartbiz.dto.StoreDTO;
 import com.smartbiz.model.StoreMetadata;
 import com.smartbiz.service.StoreService;
@@ -28,6 +29,12 @@ public class StoreController {
 	public ResponseEntity<StoreDTO> updateStoreMetadata(@PathVariable String storeId,@RequestBody StoreMetadata metadata){
 		StoreDTO store = storeService.updateStoreMetadata(storeId, metadata);
 		return new ResponseEntity<>(store,HttpStatus.ACCEPTED);
+	}
+	@GetMapping("/public/{storeName}/metadata")
+	@PublicEndpoint
+	public ResponseEntity<StoreDTO> getStoreMetadataByStoreName(@PathVariable String storeName) {
+	    StoreDTO store = storeService.getStoreMetadataByStoreName(storeName);
+	    return new ResponseEntity<>(store, HttpStatus.OK);
 	}
 
 }

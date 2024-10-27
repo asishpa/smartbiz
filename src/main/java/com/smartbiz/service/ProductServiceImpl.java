@@ -89,7 +89,6 @@ public class ProductServiceImpl implements ProductService {
 
 	@Override
 	public List<ProductsDTO> getProducts(String storeId) {
-		// Find store by storeId or throw ResourceNotFoundException
 		Store store = storeRepo.findById(storeId)
 				.orElseThrow(() -> new ResourceNotFoundException("Store does not exist with the specified storeId"));
 
@@ -101,7 +100,6 @@ public class ProductServiceImpl implements ProductService {
 	@Transactional
 	public boolean deleteProduct(String storeId, String productId) {
 		Products product = productRepo.findById(productId).orElseThrow(() -> new ResourceNotFoundException("Product not found with given Id"));
-		  // Clear associations before deletion
 		Categories category = product.getCategory();
 		Store store = product.getStore();
 		try {
@@ -136,7 +134,6 @@ public class ProductServiceImpl implements ProductService {
 
 		productRepo.save(product);
 
-		// Return the updated product DTO
 		return entityMapper.toProductsDTO(product);
 	}
 

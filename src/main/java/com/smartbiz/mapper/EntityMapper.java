@@ -41,6 +41,7 @@ public interface EntityMapper {
 	List<ProductWarehouseDTO> toProductWarehouseDTOs(List<ProductWarehouseInventory> inventories);
 
 	StoreDTO toStoreDTO(Store store);
+	OfferDTO toOfferDTO(Offer offer);
 	
 	List<OfferDTO> toOfferDTO(List<Offer> offer);
 	

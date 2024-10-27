@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.smartbiz.annotation.PublicEndpoint;
 import com.smartbiz.dto.CategoriesDTO;
 import com.smartbiz.dto.ProductsDTO;
 import com.smartbiz.entity.Categories;
@@ -36,6 +37,7 @@ public class ProductController {
 	private ProductService productService;
 
 	@GetMapping("/{storeId}/categories")
+	@PublicEndpoint
 	public ResponseEntity<List<CategoriesDTO>> viewCategory(@PathVariable String storeId) {
 		List<CategoriesDTO> categories = categoryService.viewCategory(storeId);
 		return new ResponseEntity<>(categories, HttpStatus.OK);
@@ -79,6 +81,7 @@ public class ProductController {
 	}
 
 	@GetMapping("/{storeId}/products")
+	@PublicEndpoint
 	public ResponseEntity<List<ProductsDTO>> getProduct(@PathVariable String storeId) {
 		List<ProductsDTO> products = productService.getProducts(storeId);
 		return new ResponseEntity<>(products, HttpStatus.OK);

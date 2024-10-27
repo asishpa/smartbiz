@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.smartbiz.annotation.PublicEndpoint;
 import com.smartbiz.dto.OfferDTO;
 import com.smartbiz.dto.ProductsDTO;
 import com.smartbiz.model.AddOffer;
@@ -58,6 +59,13 @@ public class OfferController {
 	public ResponseEntity<List<OfferDTO>> getOffers(@PathVariable String storeId){
 		List<OfferDTO> offers = offerService.getOffers(storeId);
 		return new ResponseEntity<>(offers,HttpStatus.OK);
+	}
+	@GetMapping("/public/{storeId}/offers")
+	@PublicEndpoint
+	public ResponseEntity<List<OfferDTO>> getVisibleOffer(@PathVariable String storeId){
+		List<OfferDTO> offers = offerService.getVisibleOffers(storeId);
+		return new ResponseEntity<>(offers,HttpStatus.OK);
+		
 	}
 	
 	

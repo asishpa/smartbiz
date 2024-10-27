@@ -5,6 +5,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import com.smartbiz.entity.Role;
+import com.smartbiz.entity.Role.RoleName;
 import com.smartbiz.repository.RoleRepository;
 
 @Component
@@ -18,11 +19,13 @@ public class RoleInitializer implements CommandLineRunner {
 	}
 
 	private void initializeRoles() {
-		createRoleIfNotFound("BUYER");
-        createRoleIfNotFound("STORE_OWNER");
+		createRoleIfNotFound(RoleName.BUYER);
+        createRoleIfNotFound(RoleName.STORE_OWNER);
+        createRoleIfNotFound(RoleName.MANAGER);
+        createRoleIfNotFound(RoleName.STAFF);
 	}
 
-	private void createRoleIfNotFound(String roleName) {
+	private void createRoleIfNotFound(RoleName roleName) {
 		if(roleRepo.findByRoleName(roleName).isEmpty()) {
 			Role role = new Role();
 			role.setRoleName(roleName);
