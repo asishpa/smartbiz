@@ -6,6 +6,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Version;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -28,4 +29,6 @@ public class ProductWarehouseInventory {
 	private Warehouse warehouse;
 	
 	private Integer quantity;
+	@Version
+	private Integer version;
 }

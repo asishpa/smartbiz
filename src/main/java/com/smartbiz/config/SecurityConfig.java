@@ -39,9 +39,8 @@ public class SecurityConfig {
 		http.cors(cors -> cors.configurationSource(corsConfigurationSource())).csrf(AbstractHttpConfigurer::disable)
 				.authorizeHttpRequests(requests -> requests.requestMatchers("/api/auth/**").permitAll()
 						.requestMatchers("/api-docs/**").permitAll().requestMatchers("/swagger-ui/**").permitAll()
-						.requestMatchers("/api/media/**").permitAll()
-						.requestMatchers("/api/stores/public/**").permitAll()
-						.anyRequest().authenticated())
+						.requestMatchers("/api/media/**").permitAll().requestMatchers("/api/stores/public/**")
+						.permitAll().anyRequest().authenticated())
 				.exceptionHandling(ex -> ex.authenticationEntryPoint(entryPoint))
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
@@ -54,11 +53,7 @@ public class SecurityConfig {
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration configuration = new CorsConfiguration();
-		configuration
-				.setAllowedOrigins(Arrays.asList("http://localhost:5173", "https://store-project-iota.vercel.app")); // Allow
-																														// requests
-																														// from
-																														// localhost
+		configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173", "https://store-project-iota.vercel.app","http://localhost:3000"));
 		configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS","PATCH")); // Specify allowed
 																									// methods
 		configuration.setAllowCredentials(true); // Allow cookies to be sent
