@@ -47,7 +47,6 @@ public class ProductController {
 		List<CategoriesDTO> categories = categoryService.viewCategory(storeId);
 		return new ResponseEntity<>(categories,HttpStatus.OK);
 	}
-
 	@PostMapping("/{storeId}/categories")
 	public ResponseEntity<List<CategoriesDTO>> addCategory(@RequestBody AddCategory addCategory,
 			@PathVariable String storeId) {

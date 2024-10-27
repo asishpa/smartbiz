@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.smartbiz.constants.AppConstants;
 import com.smartbiz.dto.CategoriesDTO;
 import com.smartbiz.entity.Categories;
 import com.smartbiz.entity.Store;
@@ -96,6 +97,13 @@ public class CategoryServiceImpl implements CategoryService {
 		dto.setDescription(category.getDescription());
 		dto.setActive(category.isActive());
 		return dto;
+	}
+
+	@Override
+	public CategoriesDTO viewCategoryById(String storeId, String categoryId) {
+		Store store = storeRepo.findById(storeId).orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_STORE_NOT_FOUND));
+		Categories category = categoryRepo.findById(categoryId).orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_CATEGORY_NOT_FOUND));
+		return convertToDto(category);
 	}
 
 	
