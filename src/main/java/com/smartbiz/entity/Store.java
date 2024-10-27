@@ -37,7 +37,7 @@ public class Store {
 	private Long mobileNo;
 	private String country;
 	private String storeAddress;
-	
+	private String storeEmail;
 	
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name="owner_id",nullable = false)

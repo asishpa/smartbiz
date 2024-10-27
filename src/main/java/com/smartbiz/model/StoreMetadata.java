@@ -9,5 +9,7 @@ public class StoreMetadata {
 	private Long mobileNo;
 	private String country;
 	private String storeAddress;
+	private String ownerName;
+	private String storeEmail;
 	
 }
