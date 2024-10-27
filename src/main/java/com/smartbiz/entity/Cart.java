@@ -37,6 +37,7 @@ public class Cart {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "store_id",nullable = false)
 	private Store store;
+	
 	@OneToMany(mappedBy = "cart",cascade = CascadeType.ALL,orphanRemoval = true)
 	private List<CartItem> items = new ArrayList<>();
 	@CreationTimestamp

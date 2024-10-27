@@ -14,4 +14,6 @@ public class AppConstants {
 	public static final String ERROR_ROLE_NOT_FOUND = "Role not found";
 	public static final String ERROR_STORE_NOT_FOUND = "Store not found";
 	public static final String SOMETHING_WENT_WRONG = "Something went wrong";
+	public static final String ERROR_USER_NOT_FOUND = "User not found";
+	public static final String ERROR_PRODUCT_NOT_FOUND = "Product not found";
 }

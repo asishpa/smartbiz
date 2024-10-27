@@ -36,11 +36,16 @@ public class ProductController {
 	@Autowired
 	private ProductService productService;
 
-	@GetMapping("/public/{storeId}/categories")
-	@PublicEndpoint
+	@GetMapping("/{storeId}/categories")
 	public ResponseEntity<List<CategoriesDTO>> viewCategory(@PathVariable String storeId) {
 		List<CategoriesDTO> categories = categoryService.viewCategory(storeId);
 		return new ResponseEntity<>(categories, HttpStatus.OK);
+	}
+	@GetMapping("/public/{storeId}/categories")
+	@PublicEndpoint
+	public ResponseEntity<List<CategoriesDTO>> viewBuyerCategories(@PathVariable String storeId){
+		List<CategoriesDTO> categories = categoryService.viewCategory(storeId);
+		return new ResponseEntity<>(categories,HttpStatus.OK);
 	}
 
 	@PostMapping("/{storeId}/categories")

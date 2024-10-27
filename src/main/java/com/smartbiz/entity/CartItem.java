@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Version;
 import lombok.Data;
 
 @Entity
@@ -20,5 +21,8 @@ public class CartItem {
 	private Cart cart;
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Products products;
-	private int qunatity;
+	private Integer quantity;
+	private BigDecimal price;
+	@Version
+	private Integer version;
 }

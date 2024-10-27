@@ -72,5 +72,14 @@ public class GlobalExceptionsHandler {
 		return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
 		
 	}
-
+	@ExceptionHandler(UserNotFoundException.class)
+	public ResponseEntity<ApiError> handleUserNotFoundException(UserNotFoundException ex,WebRequest request){
+		ApiError errorDetails = new ApiError(new Date(), ex.getMessage(), request.getDescription(false));
+		return new ResponseEntity<>(errorDetails,HttpStatus.FORBIDDEN);
+	}
+	@ExceptionHandler()
+	public ResponseEntity<ApiError> handleProductNotFoundException(ProductNotFoundException ex,WebRequest request){
+		ApiError errorDetails = new ApiError(new Date(), ex.getMessage(), request.getDescription(false));
+		return new ResponseEntity<>(errorDetails,HttpStatus.NOT_FOUND);
+	}
 }
