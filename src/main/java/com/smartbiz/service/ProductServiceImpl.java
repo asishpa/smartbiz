@@ -172,5 +172,12 @@ public class ProductServiceImpl implements ProductService {
 		});
 			return entityMapper.toProductsDTO(savedProduct);
 		}
+
+	@Override
+	public List<ProductsDTO> getProductByStoreId(String storeId, String categoryId) {
+		List<Products> products = productRepo.findProductsByCategoryId(categoryId);
+		return null;
+		//return entityMapper.toProductsDTO(products);
+	}
 	
 }

@@ -99,13 +99,14 @@ public class CategoryServiceImpl implements CategoryService {
 		return dto;
 	}
 
-	@Override
-	public CategoriesDTO viewCategoryById(String storeId, String categoryId) {
-		Store store = storeRepo.findById(storeId).orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_STORE_NOT_FOUND));
-		Categories category = categoryRepo.findById(categoryId).orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_CATEGORY_NOT_FOUND));
-		return convertToDto(category);
-	}
-
+	/*
+	 * @Override public CategoriesDTO viewCategoryById(String storeId, String
+	 * categoryId) { Store store = storeRepo.findById(storeId).orElseThrow(() -> new
+	 * ResourceNotFoundException(AppConstants.ERROR_STORE_NOT_FOUND)); Categories
+	 * category = categoryRepo.findById(categoryId).orElseThrow(() -> new
+	 * ResourceNotFoundException(AppConstants.ERROR_CATEGORY_NOT_FOUND)); return
+	 * convertToDto(category); }
+	 */
 	
 
 	
