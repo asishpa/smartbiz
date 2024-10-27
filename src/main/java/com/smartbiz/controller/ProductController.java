@@ -90,7 +90,12 @@ public class ProductController {
 		List<ProductsDTO> products = productService.getProducts(storeId);
 		return new ResponseEntity<>(products, HttpStatus.OK);
 	}
-
+	@GetMapping("/public/{storeId}/categories/{categoryId}/products")
+	@PublicEndpoint
+	public ResponseEntity<List<ProductsDTO>> getProductByCategoryId(@PathVariable String storeId,@PathVariable String categoryId){
+		List<ProductsDTO> products = productService.getProductByCategoryId(storeId, categoryId);
+		return new ResponseEntity<>(products,HttpStatus.OK);
+	}
 	@PatchMapping("/{storeId}/products/{productId}/partial-update")
 	public ResponseEntity<ProductsDTO> partialUpdateProduct(@PathVariable String storeId,
 			@PathVariable String productId, @RequestBody Toggle toggle) {

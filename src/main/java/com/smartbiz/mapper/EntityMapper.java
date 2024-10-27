@@ -33,7 +33,7 @@ public interface EntityMapper {
 	@Mapping(source = "warehouseInventories", target = "inventory") 
 	ProductsDTO toProductsDTO(Products product);
 
-	List<ProductsDTO> toProductsDTOs(List<ProductPhoto> products);
+	List<ProductsDTO> toProductsDTOs(List<Products> products);
 
 	@Mapping(source = "warehouse.warehouseName", target = "warehouseName")
 	ProductWarehouseDTO toProductWarehouseDTO(ProductWarehouseInventory inventory);

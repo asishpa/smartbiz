@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.google.common.base.Optional;
+import com.smartbiz.constants.AppConstants;
 import com.smartbiz.dto.ProductWarehouseDTO;
 import com.smartbiz.dto.ProductsDTO;
 import com.smartbiz.entity.Categories;
@@ -174,10 +175,11 @@ public class ProductServiceImpl implements ProductService {
 		}
 
 	@Override
-	public List<ProductsDTO> getProductByStoreId(String storeId, String categoryId) {
+	public List<ProductsDTO> getProductByCategoryId(String storeId, String categoryId) {
+		storeRepo.findById(storeId).orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_STORE_NOT_FOUND));
+		categoryRepo.findById(categoryId).orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_CATEGORY_NOT_FOUND));
 		List<Products> products = productRepo.findProductsByCategoryId(categoryId);
-		return null;
-		//return entityMapper.toProductsDTO(products);
+		return entityMapper.toProductsDTOs(products);
 	}
 	
 }
