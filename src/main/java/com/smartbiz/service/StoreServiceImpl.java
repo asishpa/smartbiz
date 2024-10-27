@@ -56,16 +56,16 @@ public class StoreServiceImpl implements StoreService {
 	}
 
 	@Override
-	public StoreDTO getStoreMetadataByStoreName(String storeName) {
-		Store store = storeRepo.findByName(storeName)
-				.orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_STORE_NOT_FOUND));
-		StoreDTO storeDTO = entityMapper.toStoreDTO(store);
+	public StoreDTO getStoreMetadataByStoreUrl(String storeLink) {
+		Store store = storeRepo.findByStoreLink(storeLink)
+	            .orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_STORE_NOT_FOUND));
+	    StoreDTO storeDTO = entityMapper.toStoreDTO(store);
 
-		// Include owner's name in the response
-		String ownerName = (store.getOwner() != null) ? store.getOwner().getUserName() : null;
-		storeDTO.setOwnerName(ownerName); // Call a setter method if it exists
+	    // Include owner's name in the response
+	    String ownerName = (store.getOwner() != null) ? store.getOwner().getUserName() : null;
+	    storeDTO.setOwnerName(ownerName); // Call a setter method if it exists
 
-		return storeDTO;
+	    return storeDTO;
 	}
 
 	public String getOwnerNameByStoreId(String storeId) {

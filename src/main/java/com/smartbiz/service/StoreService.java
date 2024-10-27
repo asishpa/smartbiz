@@ -6,5 +6,5 @@ import com.smartbiz.model.StoreMetadata;
 public interface StoreService {
 	public StoreDTO getStoreMetadata(String storeId);
 	public StoreDTO updateStoreMetadata(String storeId,StoreMetadata metadata);
-	public StoreDTO getStoreMetadataByStoreName(String storeName);
+	public StoreDTO getStoreMetadataByStoreUrl(String storeUrl);
 }

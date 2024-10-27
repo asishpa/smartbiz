@@ -30,10 +30,10 @@ public class StoreController {
 		StoreDTO store = storeService.updateStoreMetadata(storeId, metadata);
 		return new ResponseEntity<>(store,HttpStatus.ACCEPTED);
 	}
-	@GetMapping("/public/{storeName}/metadata")
+	@GetMapping("/public/{storeUrl}/metadata")
 	@PublicEndpoint
-	public ResponseEntity<StoreDTO> getStoreMetadataByStoreName(@PathVariable String storeName) {
-	    StoreDTO store = storeService.getStoreMetadataByStoreName(storeName);
+	public ResponseEntity<StoreDTO> getStoreMetadataByStoreUrl(@PathVariable String storeUrl) {
+	    StoreDTO store = storeService.getStoreMetadataByStoreUrl(storeUrl);
 	    return new ResponseEntity<>(store, HttpStatus.OK);
 	}
 
