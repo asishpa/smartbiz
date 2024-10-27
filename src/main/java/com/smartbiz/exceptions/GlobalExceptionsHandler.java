@@ -77,9 +77,13 @@ public class GlobalExceptionsHandler {
 		ApiError errorDetails = new ApiError(new Date(), ex.getMessage(), request.getDescription(false));
 		return new ResponseEntity<>(errorDetails,HttpStatus.FORBIDDEN);
 	}
-	@ExceptionHandler()
+	@ExceptionHandler(ProductNotFoundException.class)
 	public ResponseEntity<ApiError> handleProductNotFoundException(ProductNotFoundException ex,WebRequest request){
 		ApiError errorDetails = new ApiError(new Date(), ex.getMessage(), request.getDescription(false));
 		return new ResponseEntity<>(errorDetails,HttpStatus.NOT_FOUND);
+	}
+	public ResponseEntity<ApiError> handleInsufficientInventoryException(InsufficientInventoryException ex,WebRequest request){
+		ApiError errorDetails = new ApiError(new Date(), ex.getMessage(), request.getDescription(false));
+		return new ResponseEntity<>(errorDetails,HttpStatus.PRECONDITION_FAILED);
 	}
 }
