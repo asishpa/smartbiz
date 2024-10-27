@@ -53,7 +53,7 @@ public class GlobalExceptionsHandler {
 	@ExceptionHandler(ResourceNotFoundException.class)
 	public ResponseEntity<ApiError> handleResourceNotFoundException(ResourceNotFoundException ex, WebRequest request) {
 		ApiError errorDetails = new ApiError(new Date(), ex.getMessage(), request.getDescription(false));
-		return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+		return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
 	}
 
 	@ExceptionHandler(OfferExistsException.class)

@@ -1,5 +1,6 @@
 package com.smartbiz.entity;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
@@ -55,6 +56,8 @@ public class User {
     
     @Column(nullable = false)
     private String password;
+    @OneToMany(mappedBy = "customer",cascade = CascadeType.ALL,orphanRemoval = true)
+    private List<Cart> carts = new ArrayList<>();
     
     @CreationTimestamp
     private Date createdAt;

@@ -61,4 +61,7 @@ public class Store {
 	
 	@OneToMany(mappedBy = "store",cascade = CascadeType.ALL)
 	private Set<Offer> offers;
+	
+	@OneToMany(mappedBy = "store",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+	private Set<Cart> carts;
 }
