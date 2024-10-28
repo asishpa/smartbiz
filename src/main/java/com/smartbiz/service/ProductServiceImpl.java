@@ -181,5 +181,12 @@ public class ProductServiceImpl implements ProductService {
 		List<Products> products = productRepo.findProductsByCategoryId(categoryId);
 		return entityMapper.toProductsDTOs(products);
 	}
+
+	@Override
+	public ProductsDTO getProductByProductId(String storeId, String productId) {
+		storeRepo.findById(storeId).orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_STORE_NOT_FOUND));
+		Products product = productRepo.findById(productId).orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_PRODUCT_NOT_FOUND));
+		return entityMapper.toProductsDTO(product);
+	}
 	
 }
