@@ -15,6 +15,7 @@ import com.smartbiz.exceptions.ResourceNotFoundException;
 import com.smartbiz.mapper.EntityMapper;
 import com.smartbiz.model.AddOffer;
 import com.smartbiz.model.OfferValidationRequest;
+import com.smartbiz.model.Toggle;
 import com.smartbiz.repository.OfferRepository;
 import com.smartbiz.repository.StoreRepository;
 
@@ -109,6 +110,14 @@ public class OfferServiceImpl implements OfferService {
                 .filter(offer -> offer.getVisibilityType() == Offer.VisibilityType.VISIBLE_ON_STORE)
                 .map(entityMapper::toOfferDTO)
                 .collect(Collectors.toList());
+	}
+
+	@Override
+	public OfferDTO partialUpdateOffer(String storeId, String offerId, Toggle toggle) {
+		storeRepo.findById(storeId).orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_STORE_NOT_FOUND));
+		Offer existingOffer = offerRepo.findById(offerId).orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_OFFER_NOT_FOUND));
+		existingOffer.setActive(toggle.getActive());
+		return entityMapper.toOfferDTO(existingOffer);
 	}
 	
 

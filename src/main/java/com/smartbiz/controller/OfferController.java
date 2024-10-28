@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -21,6 +22,7 @@ import com.smartbiz.dto.OfferDTO;
 import com.smartbiz.dto.ProductsDTO;
 import com.smartbiz.model.AddOffer;
 import com.smartbiz.model.OfferValidationRequest;
+import com.smartbiz.model.Toggle;
 import com.smartbiz.service.OfferService;
 
 import jakarta.validation.Valid;
@@ -67,7 +69,10 @@ public class OfferController {
 		return new ResponseEntity<>(offers,HttpStatus.OK);
 		
 	}
-	
-	
+	@PatchMapping("/{storeId}/offers/{offerId}")
+	public ResponseEntity<OfferDTO> partialUpdateOffer(@PathVariable String storeID,@PathVariable String offerId,@RequestBody Toggle toggle){
+		OfferDTO offer = offerService.partialUpdateOffer(storeID, offerId, toggle);
+		return new ResponseEntity<>(offer,HttpStatus.ACCEPTED);
+	}
 
 }

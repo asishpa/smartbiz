@@ -10,6 +10,7 @@ import lombok.Data;
 @Data
 public class OfferDTO {
 	private String id;
+	private String offerType;
 	private String offerName;
 	private String offerCode;
 	private boolean active;
