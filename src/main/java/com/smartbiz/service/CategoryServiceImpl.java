@@ -20,13 +20,12 @@ import com.smartbiz.utils.SecurityUtil;
 @Service
 public class CategoryServiceImpl implements CategoryService {
 
-	
 	@Autowired
 	private CategoryRepository categoryRepo;
 
 	@Autowired
 	private StoreRepository storeRepo;
-	
+
 	@Autowired
 	private SecurityUtil securityUtil;
 
@@ -34,33 +33,27 @@ public class CategoryServiceImpl implements CategoryService {
 	public List<CategoriesDTO> addCategory(String storeId, AddCategory addCategory) {
 		Store store = storeRepo.findById(storeId).orElseThrow(() -> new ResourceNotFoundException("Store not found"));
 		Categories category = new Categories();
-		System.out.println("get category name"+addCategory.getCategoryName());
+		System.out.println("get category name" + addCategory.getCategoryName());
 		category.setCategoryName(addCategory.getCategoryName());
 		category.setDescription(addCategory.getDescription());
 		category.setActive(addCategory.isActive());
 		category.setStore(store);
 		categoryRepo.save(category);
-		return categoryRepo.findByStore(store)
-				.stream()
-				.map(this::convertToDto)
-				.collect(Collectors.toList());
+		return categoryRepo.findByStore(store).stream().map(this::convertToDto).collect(Collectors.toList());
 	}
 
 	@Override
-	public List<CategoriesDTO> deleteCategory(String storeId,String categoryId) {
+	public List<CategoriesDTO> deleteCategory(String storeId, String categoryId) {
 		Store store = storeRepo.findById(storeId).orElseThrow(() -> new ResourceNotFoundException("Store not found"));
 
 		Categories category = categoryRepo.findById(categoryId)
 				.orElseThrow(() -> new ResourceNotFoundException("Category Not found with given ID"));
 		categoryRepo.delete(category);
-		return categoryRepo.findByStore(store)
-				.stream()
-				.map(this::convertToDto)
-				.collect(Collectors.toList());
-		}
+		return categoryRepo.findByStore(store).stream().map(this::convertToDto).collect(Collectors.toList());
+	}
 
 	@Override
-	public List<CategoriesDTO> editCategoy(String storeId,String categoryId, AddCategory updatedCategory) {
+	public List<CategoriesDTO> editCategoy(String storeId, String categoryId, AddCategory updatedCategory) {
 		Store store = storeRepo.findById(storeId).orElseThrow(() -> new ResourceNotFoundException("Store not found"));
 		Categories existingCategory = categoryRepo.findById(categoryId)
 				.orElseThrow(() -> new ResourceNotFoundException("Category not found with given Id"));
@@ -68,28 +61,27 @@ public class CategoryServiceImpl implements CategoryService {
 		existingCategory.setDescription(updatedCategory.getDescription());
 		existingCategory.setActive(updatedCategory.isActive());
 		categoryRepo.save(existingCategory);
-		return categoryRepo.findByStore(store)
-				.stream()
-				.map(this::convertToDto)
-				.collect(Collectors.toList());
-		}
+		return categoryRepo.findByStore(store).stream().map(this::convertToDto).collect(Collectors.toList());
+	}
+
 	@Override
 	public List<CategoriesDTO> viewCategory(String storeId) {
 		Store store = storeRepo.findById(storeId).orElseThrow(() -> new ResourceNotFoundException("Store not found"));
 
-		return categoryRepo.findByStore(store)
-				.stream()
-				.map(this::convertToDto)
-				.collect(Collectors.toList());
+		return categoryRepo.findByStore(store).stream().map(this::convertToDto).collect(Collectors.toList());
 	}
+
 	@Override
 	public CategoriesDTO partialUpdate(String storeId, String categoryId, Boolean status) {
-		//Store store = storeRepo.findById(storeId).orElseThrow(() -> new ResourceNotFoundException("Store not found"));
-		Categories existingCategory = categoryRepo.findById(categoryId).orElseThrow(() -> new ResourceNotFoundException("Category not found with given Id"));
+		// Store store = storeRepo.findById(storeId).orElseThrow(() -> new
+		// ResourceNotFoundException("Store not found"));
+		Categories existingCategory = categoryRepo.findById(categoryId)
+				.orElseThrow(() -> new ResourceNotFoundException("Category not found with given Id"));
 		existingCategory.setActive(status);
 		categoryRepo.save(existingCategory);
 		return convertToDto(existingCategory);
 	}
+
 	private CategoriesDTO convertToDto(Categories category) {
 		CategoriesDTO dto = new CategoriesDTO();
 		dto.setCategoryId(category.getCategoryId());
@@ -99,15 +91,15 @@ public class CategoryServiceImpl implements CategoryService {
 		return dto;
 	}
 
-	/*
-	 * @Override public CategoriesDTO viewCategoryById(String storeId, String
-	 * categoryId) { Store store = storeRepo.findById(storeId).orElseThrow(() -> new
-	 * ResourceNotFoundException(AppConstants.ERROR_STORE_NOT_FOUND)); Categories
-	 * category = categoryRepo.findById(categoryId).orElseThrow(() -> new
-	 * ResourceNotFoundException(AppConstants.ERROR_CATEGORY_NOT_FOUND)); return
-	 * convertToDto(category); }
-	 */
-	
+	@Override
+	public CategoriesDTO getCategoryById(String storeId, String categoryId) {
+		Store store = storeRepo.findById(storeId)
+				.orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_STORE_NOT_FOUND));
+		Categories category = categoryRepo.findById(categoryId)
+				.orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_CATEGORY_NOT_FOUND));
+		return convertToDto(category);
+	}
 
 	
+
 }

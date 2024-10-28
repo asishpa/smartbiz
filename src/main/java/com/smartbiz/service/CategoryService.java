@@ -17,4 +17,5 @@ public interface CategoryService {
 	
 	public CategoriesDTO partialUpdate(String storeId,String categoryId,Boolean status );
 
+	public CategoriesDTO getCategoryById(String storeId,String categoryId);
 }

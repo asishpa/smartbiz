@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.smartbiz.annotation.PublicEndpoint;
 import com.smartbiz.dto.CategoriesDTO;
 import com.smartbiz.dto.ProductsDTO;
-import com.smartbiz.entity.Categories;
 import com.smartbiz.model.AddCategory;
 import com.smartbiz.model.AddProduct;
 import com.smartbiz.model.Toggle;
@@ -53,7 +51,12 @@ public class ProductController {
 		List<CategoriesDTO> categories = categoryService.addCategory(storeId, addCategory);
 		return new ResponseEntity<>(categories, HttpStatus.CREATED);
 	}
-
+	@GetMapping("/public/{storeId}/categories/{categoryId}")
+	@PublicEndpoint
+	public ResponseEntity<CategoriesDTO> getCategoryById(@PathVariable String storeId,@PathVariable String categoryId){
+		CategoriesDTO category = categoryService.getCategoryById(storeId, categoryId);
+		return new ResponseEntity<>(category,HttpStatus.OK);
+	}
 	@DeleteMapping("/{storeId}/categories/{categoryId}")
 	public ResponseEntity<List<CategoriesDTO>> deleteCategory(@PathVariable String storeId,
 			@PathVariable String categoryId) {
