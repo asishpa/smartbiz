@@ -22,7 +22,8 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-@EqualsAndHashCode(exclude = {"warehouseInventories", "photos", "store", "category"})
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(exclude = {"warehouseInventories", "photos", "store", "category"})
 public class Products {
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)

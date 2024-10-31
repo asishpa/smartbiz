@@ -1,6 +1,8 @@
 package com.smartbiz.service;
 
+import com.smartbiz.dto.DeliveryChargesDTO;
 import com.smartbiz.dto.StoreDTO;
+import com.smartbiz.model.AddDeliveryCharges;
 import com.smartbiz.model.StoreMetadata;
 
 public interface StoreService {

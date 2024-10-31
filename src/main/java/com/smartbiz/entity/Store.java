@@ -24,8 +24,8 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@EqualsAndHashCode(exclude = "owner")
-@ToString(exclude = "owner")
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(exclude = {"owner", "orders", "products", "warehouse", "category", "offers", "carts", "delivery"})
 public class Store {
 	
 	@Id
@@ -64,4 +64,7 @@ public class Store {
 	
 	@OneToMany(mappedBy = "store",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
 	private Set<Cart> carts;
+	
+	@OneToOne(mappedBy = "store",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+	private Delivery delivery;
 }

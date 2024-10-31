@@ -93,6 +93,11 @@ public class ProductController {
 		List<ProductsDTO> products = productService.getProducts(storeId);
 		return new ResponseEntity<>(products, HttpStatus.OK);
 	}
+	@GetMapping("/{storeId}/products")
+	public ResponseEntity<List<ProductsDTO>> getBuyerProducts(@PathVariable String storeId){
+		List<ProductsDTO> products = productService.getProducts(storeId);
+		return new ResponseEntity<>(products, HttpStatus.OK);
+	}
 	@GetMapping("/public/{storeId}/categories/{categoryId}/products")
 	@PublicEndpoint
 	public ResponseEntity<List<ProductsDTO>> getProductByCategoryId(@PathVariable String storeId,@PathVariable String categoryId){
