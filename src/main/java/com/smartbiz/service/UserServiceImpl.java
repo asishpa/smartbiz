@@ -101,6 +101,7 @@ public class UserServiceImpl implements UserService {
 		response.put("owner_name", user.getUserName());
 		response.put("store_name", user.getStore().getName());
 		response.put("store_id", user.getStore().getId());
+		response.put("store_url", user.getStore().getStoreLink());
 		return response;
 	}
 
