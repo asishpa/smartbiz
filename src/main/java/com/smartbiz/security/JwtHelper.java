@@ -95,6 +95,6 @@ public class JwtHelper {
 	}
 
 	private boolean isValidRole(String role) {
-		return "customer".equals(role) || "STORE_OWNER".equals(role);
+		return "BUYER".equals(role) || "STORE_OWNER".equals(role);
 	}
 }

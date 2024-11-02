@@ -79,6 +79,9 @@ public class User {
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
     private Set<Orders> orders;
     
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
+    private Set<BuyerAddress> address = new HashSet<>();
+    
     // Convert roles to authorities
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles.stream()

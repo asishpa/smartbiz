@@ -121,6 +121,10 @@ public class UserServiceImpl implements UserService {
 	public boolean buyerSignup(RegisterBuyer buyer) {
 		User user = userRepo.findByEmail(buyer.getEmail()).orElse(null);
 		if (user!= null) {
+			if (!passwordEncoder.matches(buyer.getPassword(), user.getPassword())) {
+	            throw new InvalidCredentialsException("Please enter teh same password as your seller account");
+	        }
+			
 			boolean isBuyer = user.getRoles().stream()
 			.anyMatch(role -> role.getRoleName().equals(Role.RoleName.BUYER));
 			if (isBuyer) {
@@ -152,6 +156,7 @@ public class UserServiceImpl implements UserService {
 		User user = userRepo.findByEmail(request.getEmail()).orElseThrow(() -> new InvalidCredentialsException(AppConstants.INVALID_CRED));
 		
 		if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+			System.out.println("entered here");
 			throw new InvalidCredentialsException(AppConstants.INVALID_CRED);
 		}
 		List<String> roles = userRepo.findRoleNamesByEmail(request.getEmail());
