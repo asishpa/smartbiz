@@ -16,6 +16,7 @@ import com.smartbiz.entity.Store;
 public interface InventoryRepo extends JpaRepository<ProductWarehouseInventory, Long>{
 	 
 	 List<ProductWarehouseInventory> findByProduct(Products product);
+	 List<ProductWarehouseInventory> findByProduct_IdAndWarehouse_Store_Id(String productId,String storeId);
 	 @Modifying
 	 @Query("DELETE FROM ProductWarehouseInventory p WHERE p.product.id = :productId")
 	 void deleteAllByProductId(@Param("productId") String productId);

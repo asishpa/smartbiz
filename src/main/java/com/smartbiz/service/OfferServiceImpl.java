@@ -57,6 +57,7 @@ public class OfferServiceImpl implements OfferService {
 		    offer.setStartDate(addOffer.getStartDate());
 		    offer.setEndDate(addOffer.getEndDate());
 		    offer.setCustomerType(addOffer.getCustomerType());
+		    offer.setActive(true);
 		    offer.setStore(store);
 		    offer.setMaximumDiscountAmount(addOffer.getMaximumDiscountAmount());
 		    // Set offer type specific fields

@@ -9,6 +9,8 @@ import org.mapstruct.Mappings;
 import org.mapstruct.Named;
 
 import com.smartbiz.dto.BuyerAddressDTO;
+import com.smartbiz.dto.CartItemDTO;
+import com.smartbiz.dto.CartResponseDTO;
 import com.smartbiz.dto.DeliveryChargesDTO;
 import com.smartbiz.dto.OfferDTO;
 import com.smartbiz.dto.ProductWarehouseDTO;
@@ -17,6 +19,8 @@ import com.smartbiz.dto.StoreDTO;
 import com.smartbiz.dto.WarehouseDTO;
 import com.smartbiz.dto.WarehouseInventoryDTO;
 import com.smartbiz.entity.BuyerAddress;
+import com.smartbiz.entity.Cart;
+import com.smartbiz.entity.CartItem;
 import com.smartbiz.entity.Delivery;
 import com.smartbiz.entity.Offer;
 import com.smartbiz.entity.ProductPhoto;
@@ -56,4 +60,8 @@ public interface EntityMapper {
 		return photos.stream().map(ProductPhoto::getPublicId).collect(Collectors.toList());
 	}
 	DeliveryChargesDTO toDeliveryChargeDTO(Delivery delivery);
+	
+	CartResponseDTO toCartResponseDTO(Cart cart);
+	CartItemDTO toCartItemDTO(CartItem cartItem);
+	BuyerAddressDTO toAddressDto(BuyerAddress buyerAddress);
 }

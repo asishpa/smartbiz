@@ -9,6 +9,6 @@ import com.smartbiz.entity.Cart;
 
 @Repository
 public interface CartRepository extends JpaRepository<Cart, String>{
-		Optional<Cart> findByCustomerUserId(String customerId);
-	
+	Optional<Cart> findByCustomer_UserId(String customerId);
+    Optional<Cart> findByCustomer_UserIdAndStore_Id(String customerId, String storeId);
 }

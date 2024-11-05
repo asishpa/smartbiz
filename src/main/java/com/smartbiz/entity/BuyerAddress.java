@@ -1,5 +1,10 @@
 package com.smartbiz.entity;
 
+import java.time.LocalDateTime;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -30,4 +35,9 @@ public class BuyerAddress {
 	@ManyToOne
 	@JoinColumn(name = "customer_id")
 	private User customer;
+	@CreationTimestamp
+	private LocalDateTime createdAt;
+	@UpdateTimestamp
+	private LocalDateTime updatedAt;
+	
 }

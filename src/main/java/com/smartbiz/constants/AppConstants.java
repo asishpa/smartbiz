@@ -19,4 +19,6 @@ public class AppConstants {
 	public static final String INSUFFICIENT_QUANTITY = "Requested quantity exceeds available stock across warehouses";
 	public static final String ERROR_CATEGORY_NOT_FOUND = "Category not found";
 	public static final String ERROR_OFFER_NOT_FOUND = "Offer not found";
+	public static final String OFFER_NOT_APPLICABLE_AT_STORE = "Offer not applicable at this store";
+	public static final String ERROR_CART_NOT_FOUND = "Cart not found";
 }

@@ -1,77 +1,237 @@
 package com.smartbiz.service;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.smartbiz.constants.AppConstants;
+import com.smartbiz.dto.BuyerAddressDTO;
+import com.smartbiz.dto.CartItemDTO;
+import com.smartbiz.dto.CartResponseDTO;
+import com.smartbiz.dto.OfferDTO;
+import com.smartbiz.entity.BuyerAddress;
 import com.smartbiz.entity.Cart;
 import com.smartbiz.entity.CartItem;
+import com.smartbiz.entity.Delivery;
+import com.smartbiz.entity.Delivery.DELIVERY_CHARGE_TYPE;
+import com.smartbiz.entity.DeliveryRange;
+import com.smartbiz.entity.Offer;
+import com.smartbiz.entity.Offer.OfferType;
 import com.smartbiz.entity.ProductWarehouseInventory;
 import com.smartbiz.entity.Products;
+import com.smartbiz.entity.Store;
 import com.smartbiz.entity.User;
 import com.smartbiz.exceptions.InsufficientInventoryException;
-import com.smartbiz.exceptions.ProductNotFoundException;
-import com.smartbiz.exceptions.UserNotFoundException;
+import com.smartbiz.exceptions.InvalidOfferException;
+import com.smartbiz.exceptions.ResourceNotFoundException;
+import com.smartbiz.mapper.EntityMapper;
 import com.smartbiz.model.AddToCart;
 import com.smartbiz.repository.CartItemRepository;
 import com.smartbiz.repository.CartRepository;
 import com.smartbiz.repository.InventoryRepo;
+import com.smartbiz.repository.OfferRepository;
 import com.smartbiz.repository.ProductsRepository;
+import com.smartbiz.repository.StoreRepository;
 import com.smartbiz.repository.UserRepository;
 
 import jakarta.transaction.Transactional;
 
+@Service
 public class CartServiceImpl implements CartService {
 
 	@Autowired
 	private UserRepository userRepo;
-	
+
+	@Autowired
+	private StoreRepository storeRepo;
+
 	@Autowired
 	private ProductsRepository productsRepo;
-	
+
 	@Autowired
 	private InventoryRepo inventoryRepo;
-	
+
 	@Autowired
 	private CartItemRepository cartItemRepo;
-	
+
 	@Autowired
 	private CartRepository cartRepo;
+
+	@Autowired
+	private OfferRepository offerRepo;
+
+	@Autowired
+	private EntityMapper entityMapper;
+
 	@Override
 	@Transactional
-	public Cart addToCart(AddToCart addCart) {
-		User customer = userRepo.findById(addCart.getCustomerId()).orElseThrow(() -> new UserNotFoundException(AppConstants.ERROR_USER_NOT_FOUND));
-		Products products = productsRepo.findById(addCart.getProductId()).orElseThrow(() -> new ProductNotFoundException(AppConstants.ERROR_PRODUCT_NOT_FOUND));
-		Integer totalInventory = products.getWarehouseInventories().stream()
-						.mapToInt(ProductWarehouseInventory::getQuantity)
-						.sum();
-		if (addCart.getQuantity() > totalInventory) {
-			throw new InsufficientInventoryException(AppConstants.INSUFFICIENT_QUANTITY);
+	public CartResponseDTO addItemToCart(String userId, AddToCart addCart) {
+		User user = userRepo.findById(userId)
+				.orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_USER_NOT_FOUND));
+		Products product = productsRepo.findById(addCart.getProductId())
+				.orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_PRODUCT_NOT_FOUND));
+		Store store = storeRepo.findById(addCart.getStoreId())
+				.orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_STORE_NOT_FOUND));
+		if (!product.getStore().getId().equals(addCart.getStoreId())) {
+			throw new ResourceNotFoundException("Product not in this store");
 		}
-		Cart cart = cartRepo.findByCustomerUserId(addCart.getCustomerId()).orElseGet(() -> {
-			Cart newCart = new Cart();
-			newCart.setCustomer(customer);
-			return cartRepo.save(newCart);
-		});
-		CartItem existingItem = cart.getItems().stream()
-				.filter(item -> item.getProducts().getId().equals(addCart.getProductId()))
-				.findFirst()
-				.orElse(null);
-		if (existingItem != null) {
-			int newQuantity = existingItem.getQuantity()+addCart.getQuantity();
-			if (newQuantity > totalInventory) {
-				throw new InsufficientInventoryException(AppConstants.INSUFFICIENT_QUANTITY);
-			}
-			existingItem.setQuantity(existingItem.getQuantity()+addCart.getQuantity());
-		}		
-		else {
-			CartItem cartItem = new CartItem();
-			cartItem.setProducts(products);
-			cartItem.setQuantity(addCart.getQuantity());
-			cartItem.setCart(cart);
-			cart.getItems().add(cartItem);
-			
-		}
-		return cartRepo.save(cart);
+		Cart cart = getOrCreateCart(user, store);
+		CartItem cartItem = getOrCreateCartItem(cart, product);
+
+		validateInventory(addCart.getProductId(), addCart.getStoreId(), cartItem.getQuantity() + 1);
+		cartItem.setQuantity(cartItem.getQuantity() + 1);
+		cartItemRepo.save(cartItem);
+		updateCartTotals(cart);
+
+		return createCartResponse(cart);
 	}
 
+	private Cart getOrCreateCart(User user, Store store) {
+		// Retrieve or create a new cart for the user and store
+		return cartRepo.findByCustomer_UserIdAndStore_Id(user.getUserId(), store.getId()).orElseGet(() -> {
+			Cart newCart = new Cart();
+			newCart.setCustomer(user);
+			newCart.setStore(store);
+			return cartRepo.save(newCart);
+		});
+	}
+
+	private CartItem getOrCreateCartItem(Cart cart, Products product) {
+		// Retrieve or create a new cart item for the product in the cart
+		return cart.getItems().stream().filter(item -> item.getProducts().getId().equals(product.getId())).findFirst()
+				.orElseGet(() -> {
+					CartItem newItem = new CartItem();
+					newItem.setCart(cart);
+					newItem.setProducts(product);
+					newItem.setPrice(BigDecimal.valueOf(product.getDiscountedPrice()));
+					newItem.setQuantity(0); // Initial quantity set to 0, will increment later
+					cart.getItems().add(newItem);
+					return newItem;
+				});
+	}
+
+	public CartResponseDTO applyOffer(String userId, String storeId, String offerId) {
+		Offer offer = offerRepo.findById(offerId)
+				.orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_OFFER_NOT_FOUND));
+		Cart cart = cartRepo.findByCustomer_UserIdAndStore_Id(userId, storeId)
+				.orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_CART_NOT_FOUND));
+		validateOffer(offer, cart);
+
+		cart.setAppliedOffer(offer);
+		updateCartTotals(cart);
+		return createCartResponse(cart);
+	}
+
+	private BigDecimal calculateDeliveryFee(Store store, BigDecimal subTotal) {
+		Delivery delivery = store.getDelivery();
+		if (delivery == null) {
+			return BigDecimal.ZERO;
+
+		}
+		if (delivery.getChargeType() == DELIVERY_CHARGE_TYPE.FIXED) {
+			if (subTotal.compareTo(BigDecimal.valueOf(delivery.getFreeDeliveryAbove())) >= 0) {
+				return BigDecimal.ZERO;
+
+			}
+			return BigDecimal.valueOf(delivery.getChargePerOrder());
+
+		} else {
+			for (DeliveryRange range : delivery.getVariableCharges()) {
+				if (subTotal.compareTo(BigDecimal.valueOf(range.getStartAmt())) >= 0
+						&& subTotal.compareTo(BigDecimal.valueOf(range.getEndAmt())) < 0) {
+					return BigDecimal.valueOf(range.getCharge());
+
+				}
+
+			}
+		}
+		return BigDecimal.ZERO;
+	}
+
+	private void validateOffer(Offer offer, Cart cart) {
+		System.out.println("offer validity"+offer.isActive());
+		if (!offer.isActive() || !offer.getStore().getId().equals(cart.getStore().getId())) {
+			throw new InvalidOfferException(AppConstants.OFFER_NOT_APPLICABLE_AT_STORE);
+
+		}
+		LocalDate now = LocalDate.now();
+		if (now.isBefore(offer.getStartDate()) || (offer.getEndDate() != null && now.isAfter(offer.getEndDate()))) {
+			throw new InvalidOfferException(AppConstants.ERROR_OFFER_NOT_FOUND);
+		}
+		BigDecimal subtotal = cart.getSubtotal();
+		if (subtotal.compareTo(offer.getMinimumPurchaseAmount()) < 0) {
+			throw new InvalidOfferException(AppConstants.ERROR_OFFER_NOT_FOUND);
+		}
+
+	}
+
+	private void updateCartTotals(Cart cart) {
+		BigDecimal subTotal = cart.getItems().stream()
+				.map(item -> item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
+				.reduce(BigDecimal.ZERO, BigDecimal::add);
+		cart.setSubtotal(subTotal);
+		cart.setDiscountAmount(calculateDiscount(cart));
+		cart.setDeliveryCharge(calculateDeliveryFee(cart.getStore(), subTotal));
+		cart.setTotal(subTotal.subtract(cart.getDiscountAmount()).add(cart.getDeliveryCharge()));
+	}
+
+	private BigDecimal calculateDiscount(Cart cart) {
+		Offer offer = cart.getAppliedOffer();
+		if (offer == null) {
+			return BigDecimal.ZERO;
+		}
+		BigDecimal discount;
+		if (offer.getOfferType() == OfferType.PERCENTAGE_DISCOUNT) {
+			discount = cart.getSubtotal().multiply(offer.getPercentageValue()).divide(BigDecimal.valueOf(100));
+		} else {
+			discount = offer.getFlatAmountValue();
+		}
+		return discount.min(offer.getMaximumDiscountAmount());
+	}
+
+	private void validateInventory(String productId, String storeId, Integer quantity) {
+		List<ProductWarehouseInventory> inventories = inventoryRepo.findByProduct_IdAndWarehouse_Store_Id(productId,
+				storeId);
+		if (inventories.isEmpty()) {
+			throw new InsufficientInventoryException(AppConstants.INSUFFICIENT_QUANTITY);
+		}
+		int totalAvailableQty = inventories.stream().mapToInt(ProductWarehouseInventory::getQuantity).sum();
+		if (totalAvailableQty < quantity) {
+			throw new InsufficientInventoryException(AppConstants.INSUFFICIENT_QUANTITY);
+		}
+	}
+
+	private CartResponseDTO createCartResponse(Cart cart) {
+		return CartResponseDTO.builder().cartId(cart.getId())
+				.items(cart.getItems().stream().map(this::mapToCartItemDTO).collect(Collectors.toList()))
+				.subTotal(cart.getSubtotal()).discount(cart.getDiscountAmount())
+				.deliveryCharge(cart.getDeliveryCharge()).total(cart.getTotal())
+				.appliedOfferId(cart.getAppliedOffer() != null ? mapToOfferDTO(cart.getAppliedOffer()) : null)
+				.deliveryAddress(cart.getDeliveryAddress() != null ? mapToAddressDTO(cart.getDeliveryAddress()) : null)
+				.build();
+	}
+
+	private CartItemDTO mapToCartItemDTO(CartItem cartItem) {
+		return entityMapper.toCartItemDTO(cartItem);
+	}
+
+	private OfferDTO mapToOfferDTO(Offer offer) {
+		return entityMapper.toOfferDTO(offer);
+	}
+
+	private BuyerAddressDTO mapToAddressDTO(BuyerAddress address) {
+		return entityMapper.toAddressDto(address);
+	}
+
+	@Override
+	public CartResponseDTO getCart(String userId, String storeId) {
+		Cart cart = cartRepo.findByCustomer_UserIdAndStore_Id(userId, storeId)
+				.orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_CART_NOT_FOUND));
+
+		return entityMapper.toCartResponseDTO(cart);
+	}
 }
