@@ -46,6 +46,11 @@ public class CartController {
 		CartResponseDTO cart = cartService.applyOffer(userId, storeId, offerId);
 		return new ResponseEntity<>(cart,HttpStatus.ACCEPTED);
 	}
+	@DeleteMapping("/{userId}/remove-offer")
+	public ResponseEntity<CartResponseDTO> removeOfferFromCart(String userId,String storeId){
+		CartResponseDTO cart = cartService.removeOffer(userId, storeId);
+		return new ResponseEntity<>(cart,HttpStatus.OK);
+	}
 	
 
 }

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.smartbiz.constants.AppConstants;
@@ -283,7 +284,13 @@ public class CartServiceImpl implements CartService {
 
 	@Override
 	public CartResponseDTO removeOffer(String userId, String storeId) {
-		cartRepo.findByCustomer_UserIdAndStore_Id(userId, storeId);
-		return null;
+		Cart cart = cartRepo.findByCustomer_UserIdAndStore_Id(userId, storeId)
+		.orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_CART_NOT_FOUND));
+		if (cart.getAppliedOffer() != null) {
+			cart.setAppliedOffer(null);
+			updateCartTotals(cart);
+			cartRepo.save(cart);
+		}
+		return createCartResponse(cart);
 	}
 }
