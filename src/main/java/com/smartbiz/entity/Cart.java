@@ -9,6 +9,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.mapstruct.control.MappingControl.Use;
 
+import com.smartbiz.model.AddBuyerAddress;
+
 import jakarta.annotation.Generated;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;

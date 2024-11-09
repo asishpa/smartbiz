@@ -29,7 +29,8 @@ import com.smartbiz.exceptions.InsufficientInventoryException;
 import com.smartbiz.exceptions.InvalidOfferException;
 import com.smartbiz.exceptions.ResourceNotFoundException;
 import com.smartbiz.mapper.EntityMapper;
-import com.smartbiz.model.AddToCart;
+import com.smartbiz.model.CartAction;
+import com.smartbiz.repository.BuyerAddressRepository;
 import com.smartbiz.repository.CartItemRepository;
 import com.smartbiz.repository.CartRepository;
 import com.smartbiz.repository.InventoryRepo;
@@ -65,11 +66,14 @@ public class CartServiceImpl implements CartService {
 	private OfferRepository offerRepo;
 
 	@Autowired
+	private BuyerAddressRepository addressRepo;
+
+	@Autowired
 	private EntityMapper entityMapper;
 
 	@Override
 	@Transactional
-	public CartResponseDTO addItemToCart(String userId, AddToCart addCart) {
+	public CartResponseDTO addItemToCart(String userId, CartAction addCart) {
 		User user = userRepo.findById(userId)
 				.orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_USER_NOT_FOUND));
 		Products product = productsRepo.findById(addCart.getProductId())
@@ -114,6 +118,23 @@ public class CartServiceImpl implements CartService {
 				});
 	}
 
+	public CartResponseDTO decreaseQuantityFromCart(String userId,CartAction removeItemFromCart,boolean removeCompletely) {
+		Cart cart = cartRepo.findByCustomer_UserIdAndStore_Id(userId, removeItemFromCart.getStoreId())
+				.orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_CART_NOT_FOUND));
+		CartItem cartItem = cart.getItems().stream().filter(item -> item.getProducts().getId().equals(removeItemFromCart.getProductId()))
+				.findFirst().orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_PRODUCT_NOT_FOUND));
+		if (removeCompletely || cartItem.getQuantity() == 1) {
+	        cart.getItems().remove(cartItem);
+	        cartItemRepo.delete(cartItem);
+	    } else {
+	        cartItem.setQuantity(cartItem.getQuantity() - 1);
+	        cartItemRepo.save(cartItem);
+	    }
+
+		updateCartTotals(cart);
+		return createCartResponse(cart);
+	}
+
 	public CartResponseDTO applyOffer(String userId, String storeId, String offerId) {
 		Offer offer = offerRepo.findById(offerId)
 				.orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_OFFER_NOT_FOUND));
@@ -123,6 +144,24 @@ public class CartServiceImpl implements CartService {
 
 		cart.setAppliedOffer(offer);
 		updateCartTotals(cart);
+		return createCartResponse(cart);
+	}
+
+	public CartResponseDTO addAddressToCart(String userId, String storeId, Long addressId) {
+		Cart cart = cartRepo.findByCustomer_UserIdAndStore_Id(userId, storeId)
+				.orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_CART_NOT_FOUND));
+
+		BuyerAddress address = addressRepo.findById(addressId)
+				.orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_ADDRESS_NOT_FOUND));
+
+		if (address.getCustomer().getUserId().equals(userId)) {
+			throw new ResourceNotFoundException(AppConstants.ERROR_ADDRESS_NOT_FOUND);
+
+		}
+
+		cart.setDeliveryAddress(address);
+		cartRepo.save(cart);
+
 		return createCartResponse(cart);
 	}
 
@@ -153,18 +192,25 @@ public class CartServiceImpl implements CartService {
 	}
 
 	private void validateOffer(Offer offer, Cart cart) {
-		System.out.println("offer validity"+offer.isActive());
 		if (!offer.isActive() || !offer.getStore().getId().equals(cart.getStore().getId())) {
 			throw new InvalidOfferException(AppConstants.OFFER_NOT_APPLICABLE_AT_STORE);
 
 		}
 		LocalDate now = LocalDate.now();
-		if (now.isBefore(offer.getStartDate()) || (offer.getEndDate() != null && now.isAfter(offer.getEndDate()))) {
+		System.out.println("now" + now);
+
+		if (now.isBefore(offer.getStartDate())) {
+			throw new InvalidOfferException(AppConstants.ERROR_OFFER_NOT_FOUND);
+		}
+		if (offer.getEndDate() != null && now.isAfter(offer.getEndDate())) {
 			throw new InvalidOfferException(AppConstants.ERROR_OFFER_NOT_FOUND);
 		}
 		BigDecimal subtotal = cart.getSubtotal();
+		System.out.println("get subtotal" + subtotal);
+		System.out.println("get minimum purchas amount" + offer.getMinimumPurchaseAmount());
 		if (subtotal.compareTo(offer.getMinimumPurchaseAmount()) < 0) {
-			throw new InvalidOfferException(AppConstants.ERROR_OFFER_NOT_FOUND);
+			System.out.println("enetered in 3rd");
+			throw new InvalidOfferException(AppConstants.OFFER_NOT_APPLICABLE_AT_CART);
 		}
 
 	}
@@ -233,5 +279,11 @@ public class CartServiceImpl implements CartService {
 				.orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_CART_NOT_FOUND));
 
 		return entityMapper.toCartResponseDTO(cart);
+	}
+
+	@Override
+	public CartResponseDTO removeOffer(String userId, String storeId) {
+		cartRepo.findByCustomer_UserIdAndStore_Id(userId, storeId);
+		return null;
 	}
 }

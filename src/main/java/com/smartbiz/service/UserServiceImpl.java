@@ -170,7 +170,8 @@ public class UserServiceImpl implements UserService {
 		response.put("token", token);
 		response.put("roles", List.of("BUYER"));
 		response.put("name", user.getUserName());
-		
+		response.put("buyer_id", user.getUserId());
+		response.put("buyer_name", user.getUserName());
 		return response;
 	}
 		

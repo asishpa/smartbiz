@@ -33,7 +33,6 @@ public class CategoryServiceImpl implements CategoryService {
 	public List<CategoriesDTO> addCategory(String storeId, AddCategory addCategory) {
 		Store store = storeRepo.findById(storeId).orElseThrow(() -> new ResourceNotFoundException("Store not found"));
 		Categories category = new Categories();
-		System.out.println("get category name" + addCategory.getCategoryName());
 		category.setCategoryName(addCategory.getCategoryName());
 		category.setDescription(addCategory.getDescription());
 		category.setActive(addCategory.isActive());
