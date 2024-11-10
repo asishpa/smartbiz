@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.smartbiz.constants.AppConstants;
@@ -278,7 +277,7 @@ public class CartServiceImpl implements CartService {
 	public CartResponseDTO getCart(String userId, String storeId,boolean buyNow) {
 		Cart cart;
 		if (buyNow) {
-			cart = cartRepo.findByCustomer_UserIdAndStore_IdAndIsTemporary(userId, storeId, true)
+			cart = cartRepo.findByCustomer_UserIdAndStore_IdAndTemporary(userId, storeId, true)
 				.orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_CART_NOT_FOUND));
 			
 		}
@@ -288,7 +287,7 @@ public class CartServiceImpl implements CartService {
 		}
 		
 
-		return entityMapper.toCartResponseDTO(cart);
+		return createCartResponse(cart);
 	}
 
 	@Override
@@ -315,7 +314,7 @@ public class CartServiceImpl implements CartService {
 		}
 		//validate inventory
 		validateInventory(cartAction.getProductId(), cartAction.getStoreId(), 1);
-		Cart tempCart = cartRepo.findByCustomer_UserIdAndStore_IdAndIsTemporary(userId, store.getId(), true)
+		Cart tempCart = cartRepo.findByCustomer_UserIdAndStore_IdAndTemporary(userId, store.getId(), true)
 			.orElseGet(() -> {
 				Cart newCart = new Cart();
 				newCart.setCustomer(user);

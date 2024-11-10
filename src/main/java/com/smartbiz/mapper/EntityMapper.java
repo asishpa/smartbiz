@@ -62,6 +62,13 @@ public interface EntityMapper {
 	DeliveryChargesDTO toDeliveryChargeDTO(Delivery delivery);
 	
 	CartResponseDTO toCartResponseDTO(Cart cart);
+	@Mappings({
+		@Mapping(source = "products.id", target = "productId"),
+		@Mapping(source = "products.productName",target = "productName"),
+		@Mapping(source = "products.discountedPrice",target = "discountedPrice"),
+		@Mapping(source = "products.actualPrice",target = "actualPrice"),
+		@Mapping(source = "products.photos", target = "productPhoto", qualifiedByName = "mapPhotosToPublicIds")
+	})
 	CartItemDTO toCartItemDTO(CartItem cartItem);
 	BuyerAddressDTO toAddressDto(BuyerAddress buyerAddress);
 }

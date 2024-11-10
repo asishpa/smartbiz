@@ -12,8 +12,6 @@ import lombok.Data;
 @Builder
 public class CartResponseDTO {
 	private String cartId;
-	private String storeId;
-	private String storeName;
 	private List<CartItemDTO> items;
 	private BigDecimal deliveryCharge;
 	private BigDecimal subTotal;

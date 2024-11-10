@@ -11,6 +11,6 @@ import com.smartbiz.entity.Cart;
 public interface CartRepository extends JpaRepository<Cart, String>{
 	Optional<Cart> findByCustomer_UserId(String customerId);
     Optional<Cart> findByCustomer_UserIdAndStore_Id(String customerId, String storeId);
-    Optional<Cart> findByCustomer_UserIdAndStore_IdAndIsTemporary(String customerId,String storeId,boolean isTemporary);
+    Optional<Cart> findByCustomer_UserIdAndStore_IdAndTemporary(String customerId,String storeId,boolean isTemporary);
     
 }
