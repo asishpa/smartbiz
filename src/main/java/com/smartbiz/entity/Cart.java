@@ -62,6 +62,7 @@ public class Cart {
 	private BigDecimal deliveryCharge = BigDecimal.ZERO;
 	@Column(precision = 10, scale = 2)
 	private BigDecimal total = BigDecimal.ZERO;
+	private Boolean temporary;
 	@CreationTimestamp
 	private LocalDateTime createdAt;
 	@UpdateTimestamp

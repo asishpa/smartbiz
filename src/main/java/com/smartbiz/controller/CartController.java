@@ -26,8 +26,15 @@ public class CartController {
 	private CartService cartService;
 
 	@PostMapping("/{userId}/cart")
-	public ResponseEntity<CartResponseDTO> addItemToCart(@PathVariable String userId, @RequestBody CartAction addCart) {
-		CartResponseDTO cartResponse = cartService.addItemToCart(userId, addCart);
+	public ResponseEntity<CartResponseDTO> addItemToCart(@PathVariable String userId, @RequestBody CartAction addCart,@RequestParam boolean buyNow) {
+		CartResponseDTO cartResponse;
+		if (!buyNow) {
+			 cartResponse = cartService.addItemToCart(userId, addCart);
+		}
+		else {
+			cartResponse = cartService.buyNow(userId, addCart);
+		}
+		
 		return new ResponseEntity<>(cartResponse, HttpStatus.OK);
 	}
 	@DeleteMapping("/{userId}/cart")
@@ -36,8 +43,8 @@ public class CartController {
 		return new ResponseEntity<>(cartResponse,HttpStatus.OK);
 	}
 	@GetMapping("/{userId}/cart")
-	public ResponseEntity<CartResponseDTO> getCartDetails(@PathVariable String userId,@RequestParam String storeId){
-		CartResponseDTO cart = cartService.getCart(userId, storeId);
+	public ResponseEntity<CartResponseDTO> getCartDetails(@PathVariable String userId,@RequestParam String storeId,@RequestParam boolean buyNow){
+		CartResponseDTO cart = cartService.getCart(userId, storeId,buyNow);
 		return new ResponseEntity<>(cart,HttpStatus.OK);
 	}
 	@PostMapping("/{userId}/apply-offer")
@@ -46,7 +53,7 @@ public class CartController {
 		CartResponseDTO cart = cartService.applyOffer(userId, storeId, offerId);
 		return new ResponseEntity<>(cart,HttpStatus.ACCEPTED);
 	}
-	@DeleteMapping("/{userId}/remove-offer")
+	@PostMapping("/{userId}/remove-offer")
 	public ResponseEntity<CartResponseDTO> removeOfferFromCart(String userId,String storeId){
 		CartResponseDTO cart = cartService.removeOffer(userId, storeId);
 		return new ResponseEntity<>(cart,HttpStatus.OK);

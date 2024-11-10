@@ -275,9 +275,18 @@ public class CartServiceImpl implements CartService {
 	}
 
 	@Override
-	public CartResponseDTO getCart(String userId, String storeId) {
-		Cart cart = cartRepo.findByCustomer_UserIdAndStore_Id(userId, storeId)
+	public CartResponseDTO getCart(String userId, String storeId,boolean buyNow) {
+		Cart cart;
+		if (buyNow) {
+			cart = cartRepo.findByCustomer_UserIdAndStore_IdAndIsTemporary(userId, storeId, true)
 				.orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_CART_NOT_FOUND));
+			
+		}
+		else {
+			cart = cartRepo.findByCustomer_UserIdAndStore_Id(userId, storeId)
+					.orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_CART_NOT_FOUND));
+		}
+		
 
 		return entityMapper.toCartResponseDTO(cart);
 	}
@@ -292,5 +301,44 @@ public class CartServiceImpl implements CartService {
 			cartRepo.save(cart);
 		}
 		return createCartResponse(cart);
+	}
+
+	@Override
+	public CartResponseDTO buyNow(String userId, CartAction cartAction) {
+		User user = userRepo.findById(userId)
+			.orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_USER_NOT_FOUND));
+		Products product = productsRepo.findById(cartAction.getProductId())
+			.orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_PRODUCT_NOT_FOUND));
+		Store store = storeRepo.findById(cartAction.getStoreId()).orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_STORE_NOT_FOUND));
+		if (!product.getStore().getId().equals(cartAction.getStoreId())) {
+			throw new ResourceNotFoundException("Product not in this store");
+		}
+		//validate inventory
+		validateInventory(cartAction.getProductId(), cartAction.getStoreId(), 1);
+		Cart tempCart = cartRepo.findByCustomer_UserIdAndStore_IdAndIsTemporary(userId, store.getId(), true)
+			.orElseGet(() -> {
+				Cart newCart = new Cart();
+				newCart.setCustomer(user);
+				newCart.setStore(store);
+				newCart.setTemporary(false);
+				return cartRepo.save(newCart);
+			});
+		if (!tempCart.getItems().isEmpty()) {
+			CartItem existingItem = tempCart.getItems().iterator().next();
+			tempCart.getItems().remove(existingItem);
+			cartItemRepo.delete(existingItem);
+		}
+		CartItem newItem = new CartItem();
+		newItem.setCart(tempCart);
+		newItem.setProducts(product);
+		newItem.setPrice(BigDecimal.valueOf(product.getDiscountedPrice()));
+		newItem.setQuantity(1);
+		tempCart.getItems().add(newItem);
+		cartItemRepo.save(newItem);
+		
+		updateCartTotals(tempCart);
+		cartRepo.save(tempCart);
+		
+		return createCartResponse(tempCart);
 	}
 }
