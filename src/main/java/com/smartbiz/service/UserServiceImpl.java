@@ -85,7 +85,7 @@ public class UserServiceImpl implements UserService {
 		Map<String, Object> response = new HashMap<>();
 		User user = userRepo.findByEmail(request.getEmail())
 				.orElseThrow(() -> new InvalidCredentialsException(AppConstants.INVALID_CRED));
-		System.out.println(user);
+		//System.out.println(user);
 		if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
 			throw new InvalidCredentialsException(AppConstants.INVALID_CRED);
 		}
@@ -93,8 +93,8 @@ public class UserServiceImpl implements UserService {
 		if (!roles.contains("STORE_OWNER")) {
 			throw new UnauthorizedAccessException(AppConstants.ERROR_UNAUTHORIZED_ACCESS_SELLER);
 		}
-		String token = jwtHelper.generateToken(user.getEmail(), roles.get(0), String.valueOf(user.getUserId()));
-		System.out.println("entered");
+		String token = jwtHelper.generateToken(user.getEmail(), roles, String.valueOf(user.getUserId()));
+		//System.out.println("entered");
 		response.put("status", AppConstants.SUCCESS);
 		response.put("token", token);
 		response.put("roles", roles);
@@ -165,7 +165,7 @@ public class UserServiceImpl implements UserService {
 	    if (!roles.contains("BUYER")) {
 	        throw new UnauthorizedAccessException(AppConstants.ERROR_UNAUTHORIZED_ACCESS_BUYER);
 	    }
-		String token = jwtHelper.generateToken(user.getEmail(), "BUYER",String.valueOf(user.getUserId()));
+		String token = jwtHelper.generateToken(user.getEmail(), roles,String.valueOf(user.getUserId()));
 		response.put("status", AppConstants.SUCCESS);
 		response.put("token", token);
 		response.put("roles", List.of("BUYER"));

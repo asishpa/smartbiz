@@ -16,6 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -32,8 +33,9 @@ public class JwtHelper {
 		return getClaimFromToken(token, Claims::getSubject);
 	}
 
-	public String getRoleFromToken(String token) {
-		return getClaimFromToken(token, claims -> (String) claims.get("role"));
+	public List<String> getRolesFromToken(String token) {
+		String roles = getClaimFromToken(token, claims -> (String) claims.get("roles"));
+		return List.of(roles.split(","));
 	}
 
 	public Date getExpirationFromToken(String token) {
@@ -44,10 +46,11 @@ public class JwtHelper {
 		return getExpirationFromToken(token).before(new Date());
 	}
 
-	public String generateToken(String email, String roleName, String userId) {
-		Map<String, Object> claims = new HashMap<>();
-		claims.put("role", roleName);
-		claims.put("userId", userId);
+	public String generateToken(String email, List<String> roles, String userId) {
+		Map<String, Object> claims = Map.of(
+				"userId", userId,
+				"roles", String.join(",", roles)
+		);
 
 		return createToken(claims, email);
 	}
@@ -56,28 +59,28 @@ public class JwtHelper {
 		String token = Jwts.builder().claims(claims).subject(subject).issuedAt(new Date(System.currentTimeMillis()))
 				.expiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
 				.signWith(getSignKey(), Jwts.SIG.HS256).compact();
-		System.out.println(token);
+		//System.out.println(token);
 		return token;
 		
 	}
 
 	public Boolean validateToken(String token, UserDetails userDetails) {
 		final String username = getUserNameFromToken(token);
-		final String role = getRoleFromToken(token);
+		final List<String> roles = getRolesFromToken(token);
 		System.out.println("Username from token: " + username);
-		System.out.println("roles"+role);
+		//System.out.println("roles"+role);
 		 // Check if the username matches the UserDetails
 	    boolean isUsernameValid = username.equals(userDetails.getUsername());
 	    System.out.println("Is username valid: " + isUsernameValid);
 	    
 	    // Check if the token is expired
 	    boolean isTokenExpired = isTokenExpired(token);
-	    System.out.println("Is token expired: " + isTokenExpired);
+	    //System.out.println("Is token expired: " + isTokenExpired);
 	    
 	    // Check if the role is valid
-	    boolean isValidRole = isValidRole(role);
-	    System.out.println("Is role valid: " + isValidRole);
-		return (username.equals(userDetails.getUsername()) && !isTokenExpired(token) && isValidRole(role));
+	    boolean hasValidRole = roles.stream().anyMatch(this::isValidRole);
+        //System.out.println("Has valid role: " + hasValidRole);
+        return isUsernameValid && !isTokenExpired && hasValidRole;
 	}
 
 	private SecretKey getSignKey() {
