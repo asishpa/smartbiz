@@ -43,9 +43,10 @@ public class BuyerOrderServiceImpl implements BuyerOrderService {
 	@Override
 	/**
 	 * Configures a transactional boundary with REPEATABLE_READ isolation level.
-	 * This ensures that within a single transaction, any data read during the transaction will remain consistent, 
-	 * even if other concurrent transactions modify it. 
-	 * Prevents issues like non-repeatable reads, ensuring stable reads on the same data.
+	 * This ensures that within a single transaction, any data read during the
+	 * transaction will remain consistent, even if other concurrent transactions
+	 * modify it. Prevents issues like non-repeatable reads, ensuring stable reads
+	 * on the same data.
 	 */
 	@Transactional(isolation = Isolation.REPEATABLE_READ)
 	public OrderDTO createOrder(String userId, String storeId, CreateOrder createOrder) {
@@ -59,22 +60,29 @@ public class BuyerOrderServiceImpl implements BuyerOrderService {
 			cartRepo.delete(cart);
 			return entityMapper.toOrderDTO(order);
 		} catch (Exception e) {
-			//System.out.print(e.printStackTrace());
+			// System.out.print(e.printStackTrace());
 			e.printStackTrace();
 			throw new BusinessException(AppConstants.ERROR_ORDER_CREATE_FAIL);
 		}
 
 	}
+
 	@Override
-	public List<OrderDTO> getOrders(String userId, String storeId) {
+	public List<OrderDTO> getAllOrders(String userId, String storeId) {
 		List<Orders> orders = orderRepo.findByCustomerUserIdAndStoreId(userId, storeId);
 		if (orders.isEmpty()) {
 			throw new ResourceNotFoundException(AppConstants.ERROR_ORDER_NOT_FOUND_FOR_STORE);
 		}
-		return orders.stream()
-				.map(entityMapper::toOrderDTO)
-				.toList();
+		return orders.stream().map(entityMapper::toOrderDTO).toList();
 	}
+
+	public OrderDTO getOrderById(String userId,String orderId) {
+		Orders order = orderRepo.findById(orderId).orElseThrow(() -> {
+			throw new ResourceNotFoundException(AppConstants.ERROR_ORDER_NOT_FOUND);
+		});
+		return entityMapper.toOrderDTO(order);
+	}
+
 	private Cart validateCart(String userId, String storeId, boolean buynow) {
 		Optional<Cart> cartOptional = buynow
 				? cartRepo.findByCustomer_UserIdAndStore_IdAndTemporary(userId, storeId, true)
@@ -136,32 +144,33 @@ public class BuyerOrderServiceImpl implements BuyerOrderService {
 				.paymentMethod(createOrder.getPaymentMethod()).orderType(createOrder.getFulfillmentType())
 				.buyerAddress(cart.getDeliveryAddress()).offer(cart.getAppliedOffer()).customer(cart.getCustomer())
 				.store(cart.getStore()).build();
+		// Apply the offer's discount if applicable
+		if (cart.getAppliedOffer() != null) {
+		    BigDecimal discount = cart.getAppliedOffer().getMaximumDiscountAmount();  // Assuming 'Offer' has a discountAmount field
+		    order.setOffer(cart.getAppliedOffer());
+		    order.setOrderAmt(order.getOrderAmt().subtract(discount));  // Adjust the total based on the discount
+		}
 		
-		// create order items
-		//cart.getItems().forEach(cartItem -> {
-			// Debug: Print each cart item details
-			/*
-			 * System.out.println("Processing Cart Item:");
-			 * System.out.println("Product ID: " + cartItem.getProducts().getId());
-			 * System.out.println("Product Name: " +
-			 * cartItem.getProducts().getProductName()); System.out.println("Quantity: " +
-			 * cartItem.getQuantity()); System.out.println("Price per Unit: " +
-			 * cartItem.getPrice()); System.out.println("Subtotal for Item: " +
-			 * cartItem.getPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity())));
-			 */
-			// create order items using setters
-		    cart.getItems().forEach(cartItem -> {
-		        OrderItem orderItem = new OrderItem();
-		        orderItem.setOrder(order);
-		        orderItem.setProduct(cartItem.getProducts());
-		        orderItem.setQty(cartItem.getQuantity());
-		        orderItem.setPrice(cartItem.getPrice());
-		        orderItem.setSubtotal(cartItem.getPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity())));
-		        // Add the created order item to the order
-		        order.addItem(orderItem);
+		// create order items using setters
+		cart.getItems().forEach(cartItem -> {
+			OrderItem orderItem = new OrderItem();
+			orderItem.setOrder(order);
+			orderItem.setProduct(cartItem.getProducts());
+			orderItem.setQty(cartItem.getQuantity());
+			orderItem.setPrice(cartItem.getPrice());
+			orderItem.setSubtotal(cartItem.getPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity())));
+			// Add the created order item to the order
+			order.addItem(orderItem);
 		});
 		order.updateStatus(OrderStatus.PENDING, "Order Created");
 		return order;
 	}
+
+	@Override
+	public OrderDTO cancelOrder(String StoreId, String orderId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
+
 }

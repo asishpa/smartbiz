@@ -6,6 +6,9 @@ import com.smartbiz.dto.OrderDTO;
 import com.smartbiz.model.CreateOrder;
 
 public interface BuyerOrderService {
-	public OrderDTO createOrder(String userId,String storeId, CreateOrder createOrder);
-	public List<OrderDTO> getOrders(String userId,String storeId);
+	 OrderDTO createOrder(String userId, String storeId, CreateOrder createOrder);
+	 List<OrderDTO> getAllOrders(String userId, String storeId);
+	 OrderDTO getOrderById(String userId, String orderId);
+	 public OrderDTO cancelOrder(String StoreId,String orderId);
 }
+

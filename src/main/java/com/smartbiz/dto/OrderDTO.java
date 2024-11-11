@@ -16,8 +16,9 @@ import lombok.Data;
 public class OrderDTO {
 	private String id;
 	private BigDecimal orderAmt;
-	private List<OrderItem> items;
-	private BuyerAddress buyerAddress;
+	private List<OrderItemDTO> items;
+	private OfferDTO offer;
+	private BuyerAddressDTO buyerAddress;
 	private OrderStatus status;
 	private PaymentMethod paymentMethod;
 	private FulfillmentType orderType;

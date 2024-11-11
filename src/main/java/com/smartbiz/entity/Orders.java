@@ -26,7 +26,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Data
@@ -51,10 +50,11 @@ public class Orders {
 	// Orders items/statusHistory by createdAt in descending order, so the most
 	// recent entries appear first.
 	@OrderBy("createdAt DESC")
+	@Builder.Default
 	private List<OrderStatusHistory> statusHistory = new ArrayList<>();
 
 	@OneToOne
-	@JoinColumn(name = "offer_id", nullable = false)
+	@JoinColumn(name = "offer_id")
 	private Offer offer;
 
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -65,9 +65,15 @@ public class Orders {
 	@JoinColumn(name = "store_id", nullable = false)
 	private Store store;
 	@OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+	@Builder.Default
 	private List<OrderItem> items = new ArrayList<>();
 	@CreationTimestamp
 	private Date createdAt;
+
+	public Orders() {
+        this.statusHistory = new ArrayList<>();  // Ensures statusHistory is never null
+        this.items = new ArrayList<>();  // Ensures items is never null
+    }
 
 	// helper methods
 	public void addItem(OrderItem item) {
@@ -77,6 +83,7 @@ public class Orders {
 	        System.out.println("null in items list");
 			this.items = new ArrayList<>();
 	    }
+		//System.out.println("no null in items list");
 		item.setOrder(this);  
 	    items.add(item);
 	    System.out.println("exited out of addItem");

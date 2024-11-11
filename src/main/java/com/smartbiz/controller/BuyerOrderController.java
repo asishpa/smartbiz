@@ -21,7 +21,7 @@ import com.smartbiz.service.BuyerOrderService;
 @RestController
 @CrossOrigin
 @RequestMapping("/api/buyer")
-public class OrderController {
+public class BuyerOrderController {
 	@Autowired
 	private BuyerOrderService buyerOrderService;
 
@@ -35,8 +35,13 @@ public class OrderController {
 	}
 	@GetMapping("/{userId}/orders")
 	public ResponseEntity<List<OrderDTO>> getOrdersByStore(@PathVariable String userId, @RequestParam String storeId) {
-	    List<OrderDTO> orders = buyerOrderService.getOrders(userId, storeId);
+	    List<OrderDTO> orders = buyerOrderService.getAllOrders(userId, storeId);
 	    return new ResponseEntity<>(orders, HttpStatus.OK);
+	}
+	@GetMapping("/{userId}/orders/order-details")
+	public ResponseEntity<OrderDTO> getOrderById(@PathVariable String userId,@RequestParam String orderId){
+		OrderDTO order = buyerOrderService.getOrderById(userId, orderId);
+		return new ResponseEntity<>(order,HttpStatus.OK);
 	}
 
 }

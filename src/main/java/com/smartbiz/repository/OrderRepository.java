@@ -10,5 +10,5 @@ import com.smartbiz.entity.Orders;
 @Repository
 public interface OrderRepository extends JpaRepository<Orders, String>{
 	public List<Orders> findByCustomerUserIdAndStoreId(String userId,String storeId);
-	
+	public List<Orders> findByStoreId(String storeId);
 }

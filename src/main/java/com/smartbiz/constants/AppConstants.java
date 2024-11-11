@@ -26,4 +26,5 @@ public class AppConstants {
 	public static final String ERROR_CART_EMPTY = "Cart is empty";
 	public static final String ERROR_ORDER_CREATE_FAIL = "Error while creating order";
 	public static final String ERROR_ORDER_NOT_FOUND_FOR_STORE = "No orders found in this store";
+	public static final String ERROR_ORDER_NOT_FOUND = "No orders with given id";
 }
