@@ -24,4 +24,6 @@ public class AppConstants {
 	public static final String OFFER_NOT_APPLICABLE_AT_CART = "Offer not applicable at cart";
 	public static final String ERROR_ADDRESS_NOT_FOUND = "Address not found";
 	public static final String ERROR_CART_EMPTY = "Cart is empty";
+	public static final String ERROR_ORDER_CREATE_FAIL = "Error while creating order";
+	public static final String ERROR_ORDER_NOT_FOUND_FOR_STORE = "No orders found in this store";
 }

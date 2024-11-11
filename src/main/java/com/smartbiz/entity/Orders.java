@@ -19,13 +19,16 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.OrderBy;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @Data
 public class Orders {
 
@@ -43,6 +46,11 @@ public class Orders {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "address_id", nullable = false)
 	private BuyerAddress buyerAddress;
+	
+	@OneToMany(mappedBy = "order")
+	// Orders items/statusHistory by createdAt in descending order, so the most recent entries appear first.
+	@OrderBy("createdAt DESC")
+	private List<OrderStatusHistory> statusHistory = new ArrayList<>();
 
 	@OneToOne
 	@JoinColumn(name = "offer_id", nullable = false)
@@ -57,13 +65,45 @@ public class Orders {
 	private Store store;
 	@OneToMany(mappedBy = "order",cascade = CascadeType.ALL,orphanRemoval = true)
 	private List<OrderItem> items = new ArrayList<>();
-	
-
 	@CreationTimestamp
 	private Date createdAt;
 
+	//helper methods
+	public void addItem(OrderItem item) {
+	    item.setOrder(this);  
+	    items.add(item);      
+	}
+	public void removeItem(OrderItem item) {
+		item.setOrder(null);
+		items.remove(item);
+	}
+	 public void updateStatus(OrderStatus newStatus, String comment) {
+	        OrderStatusHistory history = new OrderStatusHistory();
+	        history.setOrder(this);
+	        history.setPreviousStatus(this.status);
+	        history.setNewStatus(newStatus);
+	        history.setComment(comment);
+	        
+	        this.status = newStatus;
+	        this.statusHistory.add(history);
+	    }
 	public enum OrderStatus {
-		PENDING, ACCEPTED, SHIPPED, PICKUP_READY, DELIVERED_OR_PICKED, CANCELLED, REJECTED
+		PENDING("Pending"),
+		ACCEPTED("Accepted"),
+		SHIPPED("Shipped"), 
+		PICKUP_READY("Pickup Ready"),
+		DELIVERED_OR_PICKED("Delivered/Picked"),
+		CANCELLED("Cancelled"),
+		REJECTED("Rejected");
+		private final String displayName;
+
+		OrderStatus(String displayName) {
+			this.displayName = displayName;
+		}
+
+		public String getDisplayName() {
+			return displayName;
+		}
 	}
 
 	public enum PaymentMethod {

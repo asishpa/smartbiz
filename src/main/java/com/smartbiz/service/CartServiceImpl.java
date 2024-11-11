@@ -137,11 +137,18 @@ public class CartServiceImpl implements CartService {
 		return createCartResponse(cart);
 	}
 
-	public CartResponseDTO applyOffer(String userId, String storeId, String offerId) {
+	public CartResponseDTO applyOffer(String userId, String storeId, String offerId,boolean buyNow) {
 		Offer offer = offerRepo.findById(offerId)
 				.orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_OFFER_NOT_FOUND));
-		Cart cart = cartRepo.findByCustomer_UserIdAndStore_Id(userId, storeId)
-				.orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_CART_NOT_FOUND));
+		Cart cart;
+		if (buyNow) {
+			cart = cartRepo.findByCustomer_UserIdAndStore_IdAndTemporary(userId, storeId, true)
+					.orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_CART_NOT_FOUND));
+
+		} else {
+			cart = cartRepo.findByCustomer_UserIdAndStore_Id(userId, storeId)
+					.orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_CART_NOT_FOUND));
+		}
 		validateOffer(offer, cart);
 
 		cart.setAppliedOffer(offer);

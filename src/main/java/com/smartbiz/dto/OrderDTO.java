@@ -2,7 +2,10 @@ package com.smartbiz.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
+import com.smartbiz.entity.BuyerAddress;
+import com.smartbiz.entity.OrderItem;
 import com.smartbiz.entity.Orders.FulfillmentType;
 import com.smartbiz.entity.Orders.OrderStatus;
 import com.smartbiz.entity.Orders.PaymentMethod;
@@ -13,7 +16,8 @@ import lombok.Data;
 public class OrderDTO {
 	private String id;
 	private BigDecimal orderAmt;
-	private Integer items;
+	private List<OrderItem> items;
+	private BuyerAddress buyerAddress;
 	private OrderStatus status;
 	private PaymentMethod paymentMethod;
 	private FulfillmentType orderType;

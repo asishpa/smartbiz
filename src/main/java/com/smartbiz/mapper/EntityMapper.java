@@ -13,6 +13,7 @@ import com.smartbiz.dto.CartItemDTO;
 import com.smartbiz.dto.CartResponseDTO;
 import com.smartbiz.dto.DeliveryChargesDTO;
 import com.smartbiz.dto.OfferDTO;
+import com.smartbiz.dto.OrderDTO;
 import com.smartbiz.dto.ProductWarehouseDTO;
 import com.smartbiz.dto.ProductsDTO;
 import com.smartbiz.dto.StoreDTO;
@@ -23,6 +24,7 @@ import com.smartbiz.entity.Cart;
 import com.smartbiz.entity.CartItem;
 import com.smartbiz.entity.Delivery;
 import com.smartbiz.entity.Offer;
+import com.smartbiz.entity.Orders;
 import com.smartbiz.entity.ProductPhoto;
 import com.smartbiz.entity.ProductWarehouseInventory;
 import com.smartbiz.entity.Products;
@@ -71,4 +73,11 @@ public interface EntityMapper {
 	})
 	CartItemDTO toCartItemDTO(CartItem cartItem);
 	BuyerAddressDTO toAddressDto(BuyerAddress buyerAddress);
+	@Mappings({
+		@Mapping(source = "store.name",target = "storeName"),
+		@Mapping(source = "customer.userName",target = "customerName")
+	})
+	OrderDTO toOrderDTO(Orders order);
+	
+	Orders toOrderEntity(OrderDTO order);
 }
