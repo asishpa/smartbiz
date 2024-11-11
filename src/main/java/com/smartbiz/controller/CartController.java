@@ -62,8 +62,8 @@ public class CartController {
 		return new ResponseEntity<>(cart,HttpStatus.ACCEPTED);
 	}
 	@PostMapping("/{userId}/cart/remove-offer")
-	public ResponseEntity<CartResponseDTO> removeOfferFromCart(@PathVariable String userId,@RequestParam String storeId){
-		CartResponseDTO cart = cartService.removeOffer(userId, storeId);
+	public ResponseEntity<CartResponseDTO> removeOfferFromCart(@PathVariable String userId,@RequestParam String storeId,@RequestParam boolean buyNow){
+		CartResponseDTO cart = cartService.removeOffer(userId, storeId,buyNow);
 		return new ResponseEntity<>(cart,HttpStatus.OK);
 	}
 	

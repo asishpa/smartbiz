@@ -136,15 +136,29 @@ public class BuyerOrderServiceImpl implements BuyerOrderService {
 				.paymentMethod(createOrder.getPaymentMethod()).orderType(createOrder.getFulfillmentType())
 				.buyerAddress(cart.getDeliveryAddress()).offer(cart.getAppliedOffer()).customer(cart.getCustomer())
 				.store(cart.getStore()).build();
+		
 		// create order items
-		cart.getItems().forEach(cartItem -> {
-			OrderItem orderItem = OrderItem.builder()
-					.order(order).product(cartItem.getProducts())
-					.qty(cartItem.getQuantity())
-					.price(cartItem.getPrice())
-					.subtotal(cartItem.getPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity())))
-					.build();
-			order.addItem(orderItem);
+		//cart.getItems().forEach(cartItem -> {
+			// Debug: Print each cart item details
+			/*
+			 * System.out.println("Processing Cart Item:");
+			 * System.out.println("Product ID: " + cartItem.getProducts().getId());
+			 * System.out.println("Product Name: " +
+			 * cartItem.getProducts().getProductName()); System.out.println("Quantity: " +
+			 * cartItem.getQuantity()); System.out.println("Price per Unit: " +
+			 * cartItem.getPrice()); System.out.println("Subtotal for Item: " +
+			 * cartItem.getPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity())));
+			 */
+			// create order items using setters
+		    cart.getItems().forEach(cartItem -> {
+		        OrderItem orderItem = new OrderItem();
+		        orderItem.setOrder(order);
+		        orderItem.setProduct(cartItem.getProducts());
+		        orderItem.setQty(cartItem.getQuantity());
+		        orderItem.setPrice(cartItem.getPrice());
+		        orderItem.setSubtotal(cartItem.getPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity())));
+		        // Add the created order item to the order
+		        order.addItem(orderItem);
 		});
 		order.updateStatus(OrderStatus.PENDING, "Order Created");
 		return order;

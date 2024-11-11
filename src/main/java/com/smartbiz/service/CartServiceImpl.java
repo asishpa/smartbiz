@@ -307,9 +307,16 @@ public class CartServiceImpl implements CartService {
 	}
 
 	@Override
-	public CartResponseDTO removeOffer(String userId, String storeId) {
-		Cart cart = cartRepo.findByCustomer_UserIdAndStore_Id(userId, storeId)
-				.orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_CART_NOT_FOUND));
+	public CartResponseDTO removeOffer(String userId, String storeId,boolean buyNow) {
+		Cart cart;
+		if (buyNow) {
+			cart = cartRepo.findByCustomer_UserIdAndStore_IdAndTemporary(userId, storeId, true)
+					.orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_CART_NOT_FOUND));
+
+		} else {
+			cart = cartRepo.findByCustomer_UserIdAndStore_Id(userId, storeId)
+					.orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_CART_NOT_FOUND));
+		}
 		if (cart.getAppliedOffer() != null) {
 			cart.setAppliedOffer(null);
 			updateCartTotals(cart);

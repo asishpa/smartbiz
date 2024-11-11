@@ -72,13 +72,14 @@ public class Orders {
 	// helper methods
 	public void addItem(OrderItem item) {
 		
-		/*
-		 * if (this.items == null) {
-		 * System.out.println("items list is null in addItem method"); this.items = new
-		 * ArrayList<>(); // Initialize if null }
-		 * System.out.println("Adding item to order: " + item);
-		 */item.setOrder(this);  
-	    items.add(item);      
+		if (this.items == null) {
+	        //System.out.println("Items list is null; initializing a new list");
+	        System.out.println("null in items list");
+			this.items = new ArrayList<>();
+	    }
+		item.setOrder(this);  
+	    items.add(item);
+	    System.out.println("exited out of addItem");
 	}
 
 	public void removeItem(OrderItem item) {
