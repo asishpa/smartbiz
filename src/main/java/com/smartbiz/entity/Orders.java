@@ -1,7 +1,9 @@
 package com.smartbiz.entity;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -15,6 +17,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -30,19 +33,17 @@ public class Orders {
 	@GeneratedValue(strategy = GenerationType.UUID)
 	private String id;
 	private BigDecimal orderAmt;
-	private Integer items;
 	@Enumerated(EnumType.STRING)
 	private OrderStatus status;
 	@Enumerated(EnumType.STRING)
 	private PaymentMethod paymentMethod;
 	@Enumerated(EnumType.STRING)
 	private FulfillmentType orderType;
-	/*
-	 * @ManyToOne(fetch = FetchType.LAZY)
-	 * 
-	 * @JoinColumn(name = "address_id", nullable = false) private BuyerAddress
-	 * buyerAddress;
-	 */
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "address_id", nullable = false)
+	private BuyerAddress buyerAddress;
+
 	@OneToOne
 	@JoinColumn(name = "offer_id", nullable = false)
 	private Offer offer;
@@ -54,6 +55,9 @@ public class Orders {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "store_id", nullable = false)
 	private Store store;
+	@OneToMany(mappedBy = "order",cascade = CascadeType.ALL,orphanRemoval = true)
+	private List<OrderItem> items = new ArrayList<>();
+	
 
 	@CreationTimestamp
 	private Date createdAt;

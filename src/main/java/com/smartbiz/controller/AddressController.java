@@ -30,8 +30,8 @@ public class AddressController {
 	private AddressService addressService;
 	
 	@PutMapping("/{userId}/address")
-	public ResponseEntity<BuyerAddress> addAddress(@PathVariable String userId,@RequestBody AddBuyerAddress buyerAddress){
-		BuyerAddress address = addressService.addBuyerAddress(userId, buyerAddress);
+	public ResponseEntity<BuyerAddressDTO> addAddress(@PathVariable String userId,@RequestBody AddBuyerAddress buyerAddress){
+		BuyerAddressDTO address = addressService.addBuyerAddress(userId, buyerAddress);
 		return new ResponseEntity<>(address,HttpStatus.CREATED);
 	}
 	@GetMapping("/{userId}/address")

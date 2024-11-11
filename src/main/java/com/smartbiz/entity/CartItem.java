@@ -23,6 +23,5 @@ public class CartItem {
 	private Products products;
 	private Integer quantity;
 	private BigDecimal price;
-	@Version
-	private Integer version;
+	
 }

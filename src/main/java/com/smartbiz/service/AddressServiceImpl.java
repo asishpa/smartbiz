@@ -26,7 +26,7 @@ public class AddressServiceImpl implements AddressService{
 	@Autowired
 	private EntityMapper entityMapper;
 	@Override
-	public BuyerAddress addBuyerAddress(String userId, AddBuyerAddress addAddress) {
+	public BuyerAddressDTO addBuyerAddress(String userId, AddBuyerAddress addAddress) {
 		User user = userRepo.findById(userId).orElseThrow(() ->
 			new RuntimeException(AppConstants.ERROR_USER_NOT_FOUND));
 		BuyerAddress address = new BuyerAddress();
@@ -41,7 +41,7 @@ public class AddressServiceImpl implements AddressService{
 		address.setState(addAddress.getState());
 		address.setCustomer(user);
 		BuyerAddress buyerAddress = buyerAddressRepo.save(address);
-		return buyerAddress;
+		return entityMapper.toAddressDto(buyerAddress);
 	}
 	@Override
 	public List<BuyerAddressDTO> getAddress(String userId) {
