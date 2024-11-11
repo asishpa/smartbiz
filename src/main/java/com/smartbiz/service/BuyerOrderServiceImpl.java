@@ -53,12 +53,14 @@ public class BuyerOrderServiceImpl implements BuyerOrderService {
 		try {
 			Cart cart = validateCart(userId, storeId, false);
 			validateAndReserveInventory(cart);
+			System.out.println("enetered afetr validate");
 			Orders order = createOrderFromCart(createOrder);
 			orderRepo.save(order);
 			cartRepo.delete(cart);
 			return entityMapper.toOrderDTO(order);
 		} catch (Exception e) {
 			//System.out.print(e.printStackTrace());
+			e.printStackTrace();
 			throw new BusinessException(AppConstants.ERROR_ORDER_CREATE_FAIL);
 		}
 

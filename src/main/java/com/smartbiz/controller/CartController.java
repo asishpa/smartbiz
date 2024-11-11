@@ -55,13 +55,13 @@ public class CartController {
 		CartResponseDTO cart = cartService.addAddressToCart(userId, storeId, addressId, buyNow);
 		return new ResponseEntity<>(cart,HttpStatus.ACCEPTED); 
 	}
-	@PostMapping("/{userId}/apply-offer")
+	@PostMapping("/{userId}/cart/apply-offer")
 	public ResponseEntity<CartResponseDTO> applyOfferToCart(@PathVariable String userId,
 			@RequestParam String storeId,@RequestParam String offerId,@RequestParam boolean buyNow){
 		CartResponseDTO cart = cartService.applyOffer(userId, storeId, offerId,buyNow);
 		return new ResponseEntity<>(cart,HttpStatus.ACCEPTED);
 	}
-	@PostMapping("/{userId}/remove-offer")
+	@PostMapping("/{userId}/cart/remove-offer")
 	public ResponseEntity<CartResponseDTO> removeOfferFromCart(@PathVariable String userId,@RequestParam String storeId){
 		CartResponseDTO cart = cartService.removeOffer(userId, storeId);
 		return new ResponseEntity<>(cart,HttpStatus.OK);

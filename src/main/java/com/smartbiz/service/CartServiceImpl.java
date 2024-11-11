@@ -152,6 +152,7 @@ public class CartServiceImpl implements CartService {
 		validateOffer(offer, cart);
 
 		cart.setAppliedOffer(offer);
+		cartRepo.save(cart);
 		updateCartTotals(cart);
 		return createCartResponse(cart);
 	}
@@ -217,13 +218,14 @@ public class CartServiceImpl implements CartService {
 
 		if (now.isBefore(offer.getStartDate())) {
 			throw new InvalidOfferException(AppConstants.ERROR_OFFER_NOT_FOUND);
+			
 		}
 		if (offer.getEndDate() != null && now.isAfter(offer.getEndDate())) {
 			throw new InvalidOfferException(AppConstants.ERROR_OFFER_NOT_FOUND);
 		}
 		BigDecimal subtotal = cart.getSubtotal();
-		System.out.println("get subtotal" + subtotal);
-		System.out.println("get minimum purchas amount" + offer.getMinimumPurchaseAmount());
+		//System.out.println("get subtotal" + subtotal);
+		//System.out.println("get minimum purchas amount" + offer.getMinimumPurchaseAmount());
 		if (subtotal.compareTo(offer.getMinimumPurchaseAmount()) < 0) {
 			System.out.println("enetered in 3rd");
 			throw new InvalidOfferException(AppConstants.OFFER_NOT_APPLICABLE_AT_CART);
@@ -268,6 +270,7 @@ public class CartServiceImpl implements CartService {
 	}
 
 	private CartResponseDTO createCartResponse(Cart cart) {
+		
 		return CartResponseDTO.builder().cartId(cart.getId())
 				.items(cart.getItems().stream().map(this::mapToCartItemDTO).collect(Collectors.toList()))
 				.subTotal(cart.getSubtotal()).discount(cart.getDiscountAmount())
@@ -300,7 +303,6 @@ public class CartServiceImpl implements CartService {
 			cart = cartRepo.findByCustomer_UserIdAndStore_Id(userId, storeId)
 					.orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_CART_NOT_FOUND));
 		}
-
 		return createCartResponse(cart);
 	}
 

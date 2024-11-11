@@ -12,6 +12,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -62,7 +63,8 @@ public class Offer {
 	
 	@Enumerated(EnumType.STRING)
 	private CustomerType customerType;
-	
+	@OneToOne(mappedBy = "appliedOffer", fetch = FetchType.LAZY)
+    private Cart cart;
 	@NotNull(message = "start Date cannot be null")
 	@FutureOrPresent(message = "Start Date cannot be in the past")
 	private LocalDate startDate;
