@@ -118,18 +118,20 @@ public class CartServiceImpl implements CartService {
 				});
 	}
 
-	public CartResponseDTO decreaseQuantityFromCart(String userId,CartAction removeItemFromCart,boolean removeCompletely) {
+	public CartResponseDTO decreaseQuantityFromCart(String userId, CartAction removeItemFromCart,
+			boolean removeCompletely) {
 		Cart cart = cartRepo.findByCustomer_UserIdAndStore_Id(userId, removeItemFromCart.getStoreId())
 				.orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_CART_NOT_FOUND));
-		CartItem cartItem = cart.getItems().stream().filter(item -> item.getProducts().getId().equals(removeItemFromCart.getProductId()))
-				.findFirst().orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_PRODUCT_NOT_FOUND));
+		CartItem cartItem = cart.getItems().stream()
+				.filter(item -> item.getProducts().getId().equals(removeItemFromCart.getProductId())).findFirst()
+				.orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_PRODUCT_NOT_FOUND));
 		if (removeCompletely || cartItem.getQuantity() == 1) {
-	        cart.getItems().remove(cartItem);
-	        cartItemRepo.delete(cartItem);
-	    } else {
-	        cartItem.setQuantity(cartItem.getQuantity() - 1);
-	        cartItemRepo.save(cartItem);
-	    }
+			cart.getItems().remove(cartItem);
+			cartItemRepo.delete(cartItem);
+		} else {
+			cartItem.setQuantity(cartItem.getQuantity() - 1);
+			cartItemRepo.save(cartItem);
+		}
 
 		updateCartTotals(cart);
 		return createCartResponse(cart);
@@ -147,14 +149,21 @@ public class CartServiceImpl implements CartService {
 		return createCartResponse(cart);
 	}
 
-	public CartResponseDTO addAddressToCart(String userId, String storeId, Long addressId) {
-		Cart cart = cartRepo.findByCustomer_UserIdAndStore_Id(userId, storeId)
-				.orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_CART_NOT_FOUND));
+	public CartResponseDTO addAddressToCart(String userId, String storeId, Long addressId, boolean buyNow) {
+		Cart cart;
+		if (buyNow) {
+			cart = cartRepo.findByCustomer_UserIdAndStore_IdAndTemporary(userId, storeId, true)
+					.orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_CART_NOT_FOUND));
+
+		} else {
+			cart = cartRepo.findByCustomer_UserIdAndStore_Id(userId, storeId)
+					.orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_CART_NOT_FOUND));
+		}
 
 		BuyerAddress address = addressRepo.findById(addressId)
 				.orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_ADDRESS_NOT_FOUND));
 
-		if (address.getCustomer().getUserId().equals(userId)) {
+		if (!address.getCustomer().getUserId().equals(userId)) {
 			throw new ResourceNotFoundException(AppConstants.ERROR_ADDRESS_NOT_FOUND);
 
 		}
@@ -274,18 +283,16 @@ public class CartServiceImpl implements CartService {
 	}
 
 	@Override
-	public CartResponseDTO getCart(String userId, String storeId,boolean buyNow) {
+	public CartResponseDTO getCart(String userId, String storeId, boolean buyNow) {
 		Cart cart;
 		if (buyNow) {
 			cart = cartRepo.findByCustomer_UserIdAndStore_IdAndTemporary(userId, storeId, true)
-				.orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_CART_NOT_FOUND));
-			
-		}
-		else {
+					.orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_CART_NOT_FOUND));
+
+		} else {
 			cart = cartRepo.findByCustomer_UserIdAndStore_Id(userId, storeId)
 					.orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_CART_NOT_FOUND));
 		}
-		
 
 		return createCartResponse(cart);
 	}
@@ -293,7 +300,7 @@ public class CartServiceImpl implements CartService {
 	@Override
 	public CartResponseDTO removeOffer(String userId, String storeId) {
 		Cart cart = cartRepo.findByCustomer_UserIdAndStore_Id(userId, storeId)
-		.orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_CART_NOT_FOUND));
+				.orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_CART_NOT_FOUND));
 		if (cart.getAppliedOffer() != null) {
 			cart.setAppliedOffer(null);
 			updateCartTotals(cart);
@@ -305,23 +312,24 @@ public class CartServiceImpl implements CartService {
 	@Override
 	public CartResponseDTO buyNow(String userId, CartAction cartAction) {
 		User user = userRepo.findById(userId)
-			.orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_USER_NOT_FOUND));
+				.orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_USER_NOT_FOUND));
 		Products product = productsRepo.findById(cartAction.getProductId())
-			.orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_PRODUCT_NOT_FOUND));
-		Store store = storeRepo.findById(cartAction.getStoreId()).orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_STORE_NOT_FOUND));
+				.orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_PRODUCT_NOT_FOUND));
+		Store store = storeRepo.findById(cartAction.getStoreId())
+				.orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_STORE_NOT_FOUND));
 		if (!product.getStore().getId().equals(cartAction.getStoreId())) {
 			throw new ResourceNotFoundException("Product not in this store");
 		}
-		//validate inventory
+		// validate inventory
 		validateInventory(cartAction.getProductId(), cartAction.getStoreId(), 1);
 		Cart tempCart = cartRepo.findByCustomer_UserIdAndStore_IdAndTemporary(userId, store.getId(), true)
-			.orElseGet(() -> {
-				Cart newCart = new Cart();
-				newCart.setCustomer(user);
-				newCart.setStore(store);
-				newCart.setTemporary(false);
-				return cartRepo.save(newCart);
-			});
+				.orElseGet(() -> {
+					Cart newCart = new Cart();
+					newCart.setCustomer(user);
+					newCart.setStore(store);
+					newCart.setTemporary(false);
+					return cartRepo.save(newCart);
+				});
 		if (!tempCart.getItems().isEmpty()) {
 			CartItem existingItem = tempCart.getItems().iterator().next();
 			tempCart.getItems().remove(existingItem);
@@ -334,10 +342,10 @@ public class CartServiceImpl implements CartService {
 		newItem.setQuantity(1);
 		tempCart.getItems().add(newItem);
 		cartItemRepo.save(newItem);
-		
+
 		updateCartTotals(tempCart);
 		cartRepo.save(tempCart);
-		
+
 		return createCartResponse(tempCart);
 	}
 }

@@ -10,4 +10,5 @@ public interface CartService {
 	public CartResponseDTO decreaseQuantityFromCart(String userId,CartAction removeItemFromCart,boolean removeCompletely);
 	public CartResponseDTO removeOffer(String userId,String storeId);
 	public CartResponseDTO buyNow(String userId,CartAction addItemToTempCart);
+	public CartResponseDTO addAddressToCart(String userId,String storeId,Long addressId,boolean buyNow);
 }

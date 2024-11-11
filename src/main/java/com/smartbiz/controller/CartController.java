@@ -3,8 +3,10 @@ package com.smartbiz.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,6 +21,7 @@ import com.smartbiz.service.CartService;
 import jakarta.websocket.server.PathParam;
 
 @RestController
+@CrossOrigin
 @RequestMapping("/api/users")
 public class CartController {
 
@@ -46,6 +49,11 @@ public class CartController {
 	public ResponseEntity<CartResponseDTO> getCartDetails(@PathVariable String userId,@RequestParam String storeId,@RequestParam boolean buyNow){
 		CartResponseDTO cart = cartService.getCart(userId, storeId,buyNow);
 		return new ResponseEntity<>(cart,HttpStatus.OK);
+	}
+	@PatchMapping("/{userId}/cart")
+	public ResponseEntity<CartResponseDTO> addAddressToCart(@PathVariable String userId,@RequestParam String storeId,@RequestParam Long addressId,@RequestParam boolean buyNow){
+		CartResponseDTO cart = cartService.addAddressToCart(userId, storeId, addressId, buyNow);
+		return new ResponseEntity<>(cart,HttpStatus.ACCEPTED); 
 	}
 	@PostMapping("/{userId}/apply-offer")
 	public ResponseEntity<CartResponseDTO> applyOfferToCart(@PathVariable String userId,
