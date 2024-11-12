@@ -9,6 +9,6 @@ public interface BuyerOrderService {
 	 OrderDTO createOrder(String userId, String storeId, CreateOrder createOrder);
 	 List<OrderDTO> getAllOrders(String userId, String storeId);
 	 OrderDTO getOrderById(String userId, String orderId);
-	 public OrderDTO cancelOrder(String StoreId,String orderId);
+	 public OrderDTO cancelOrder(String orderId,String reason);
 }
 

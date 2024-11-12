@@ -239,6 +239,7 @@ public class CartServiceImpl implements CartService {
 				.map(item -> item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
 				.reduce(BigDecimal.ZERO, BigDecimal::add);
 		cart.setSubtotal(subTotal);
+		System.out.println("amt"+calculateDiscount(cart));
 		cart.setDiscountAmount(calculateDiscount(cart));
 		cart.setDeliveryCharge(calculateDeliveryFee(cart.getStore(), subTotal));
 		cart.setTotal(subTotal.subtract(cart.getDiscountAmount()).add(cart.getDeliveryCharge()));
@@ -252,10 +253,14 @@ public class CartServiceImpl implements CartService {
 		BigDecimal discount;
 		if (offer.getOfferType() == OfferType.PERCENTAGE_DISCOUNT) {
 			discount = cart.getSubtotal().multiply(offer.getPercentageValue()).divide(BigDecimal.valueOf(100));
+			return discount.min(offer.getMaximumDiscountAmount());
+			
 		} else {
 			discount = offer.getFlatAmountValue();
+			return discount;
 		}
-		return discount.min(offer.getMaximumDiscountAmount());
+		
+		
 	}
 
 	private void validateInventory(String productId, String storeId, Integer quantity) {

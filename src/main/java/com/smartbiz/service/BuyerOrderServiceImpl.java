@@ -76,11 +76,22 @@ public class BuyerOrderServiceImpl implements BuyerOrderService {
 		return orders.stream().map(entityMapper::toOrderDTO).toList();
 	}
 
-	public OrderDTO getOrderById(String userId,String orderId) {
+	public OrderDTO getOrderById(String userId, String orderId) {
 		Orders order = orderRepo.findById(orderId).orElseThrow(() -> {
 			throw new ResourceNotFoundException(AppConstants.ERROR_ORDER_NOT_FOUND);
 		});
 		return entityMapper.toOrderDTO(order);
+	}
+	@Override
+	@Transactional(isolation = Isolation.REPEATABLE_READ)
+	public OrderDTO cancelOrder(String orderId,String reason) {
+		Orders order = orderRepo.findById(orderId)
+				.orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_ORDER_NOT_FOUND));
+		if (!OrderStatus.PENDING.equals(order.getStatus())) {
+			throw new BusinessException("Order cannot be cancelled in current status:"+order.getStatus());
+		}
+		
+		return null;
 	}
 
 	private Cart validateCart(String userId, String storeId, boolean buynow) {
@@ -146,11 +157,12 @@ public class BuyerOrderServiceImpl implements BuyerOrderService {
 				.store(cart.getStore()).build();
 		// Apply the offer's discount if applicable
 		if (cart.getAppliedOffer() != null) {
-		    BigDecimal discount = cart.getAppliedOffer().getMaximumDiscountAmount();  // Assuming 'Offer' has a discountAmount field
-		    order.setOffer(cart.getAppliedOffer());
-		    order.setOrderAmt(order.getOrderAmt().subtract(discount));  // Adjust the total based on the discount
+			BigDecimal discount = cart.getAppliedOffer().getMaximumDiscountAmount(); // Assuming 'Offer' has a
+																						// discountAmount field
+			order.setOffer(cart.getAppliedOffer());
+			order.setOrderAmt(order.getOrderAmt().subtract(discount)); // Adjust the total based on the discount
 		}
-		
+
 		// create order items using setters
 		cart.getItems().forEach(cartItem -> {
 			OrderItem orderItem = new OrderItem();
@@ -165,12 +177,10 @@ public class BuyerOrderServiceImpl implements BuyerOrderService {
 		order.updateStatus(OrderStatus.PENDING, "Order Created");
 		return order;
 	}
-
-	@Override
-	public OrderDTO cancelOrder(String StoreId, String orderId) {
-		// TODO Auto-generated method stub
-		return null;
+	private void returnInventoryToStock(Orders order) {
+		
 	}
+
 	
 
 }
