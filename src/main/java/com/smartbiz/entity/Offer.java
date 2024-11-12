@@ -25,9 +25,11 @@ import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Entity
 @Data
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Offer {
 	
 	@Id
@@ -63,6 +65,7 @@ public class Offer {
 	
 	@Enumerated(EnumType.STRING)
 	private CustomerType customerType;
+	@EqualsAndHashCode.Exclude
 	@OneToOne(mappedBy = "appliedOffer", fetch = FetchType.LAZY)
     private Cart cart;
 	@NotNull(message = "start Date cannot be null")
