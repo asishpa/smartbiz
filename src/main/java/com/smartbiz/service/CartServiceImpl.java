@@ -130,8 +130,9 @@ public class CartServiceImpl implements CartService {
 			cartItemRepo.delete(cartItem);
 		} else {
 			cartItem.setQuantity(cartItem.getQuantity() - 1);
-			cartItemRepo.save(cartItem);
+			
 		}
+		cartItemRepo.save(cartItem);
 
 		updateCartTotals(cart);
 		return createCartResponse(cart);
