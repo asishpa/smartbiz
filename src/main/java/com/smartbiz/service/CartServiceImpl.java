@@ -242,6 +242,7 @@ public class CartServiceImpl implements CartService {
 		cart.setDiscountAmount(calculateDiscount(cart));
 		cart.setDeliveryCharge(calculateDeliveryFee(cart.getStore(), subTotal));
 		cart.setTotal(subTotal.subtract(cart.getDiscountAmount()).add(cart.getDeliveryCharge()));
+		cartRepo.save(cart);
 	}
 
 	private BigDecimal calculateDiscount(Cart cart) {
