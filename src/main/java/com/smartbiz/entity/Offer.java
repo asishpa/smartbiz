@@ -52,8 +52,6 @@ public class Offer {
 	@ManyToOne
 	@JoinColumn(name = "store_id")
 	private Store store;
-	@OneToOne(mappedBy = "offer")
-	private Orders order;
 	@Enumerated(EnumType.STRING)
 	private OfferType offerType;
 	

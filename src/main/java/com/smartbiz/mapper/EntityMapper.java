@@ -67,11 +67,11 @@ public interface EntityMapper {
 	
 	CartResponseDTO toCartResponseDTO(Cart cart);
 	@Mappings({
-		@Mapping(source = "products.id", target = "productId"),
-		@Mapping(source = "products.productName",target = "productName"),
-		@Mapping(source = "products.discountedPrice",target = "discountedPrice"),
-		@Mapping(source = "products.actualPrice",target = "actualPrice"),
-		@Mapping(source = "products.photos", target = "productPhoto", qualifiedByName = "mapPhotosToPublicIds")
+		@Mapping(source = "product.id", target = "productId"),
+		@Mapping(source = "product.productName",target = "productName"),
+		@Mapping(source = "product.discountedPrice",target = "discountedPrice"),
+		@Mapping(source = "product.actualPrice",target = "actualPrice"),
+		@Mapping(source = "product.photos", target = "productPhoto", qualifiedByName = "mapPhotosToPublicIds")
 	})
 	CartItemDTO toCartItemDTO(CartItem cartItem);
 	BuyerAddressDTO toAddressDto(BuyerAddress buyerAddress);

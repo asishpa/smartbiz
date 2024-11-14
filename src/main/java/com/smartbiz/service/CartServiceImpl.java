@@ -106,11 +106,11 @@ public class CartServiceImpl implements CartService {
 
 	private CartItem getOrCreateCartItem(Cart cart, Products product) {
 		// Retrieve or create a new cart item for the product in the cart
-		return cart.getItems().stream().filter(item -> item.getProducts().getId().equals(product.getId())).findFirst()
+		return cart.getItems().stream().filter(item -> item.getProduct().getId().equals(product.getId())).findFirst()
 				.orElseGet(() -> {
 					CartItem newItem = new CartItem();
 					newItem.setCart(cart);
-					newItem.setProducts(product);
+					newItem.setProduct(product);
 					newItem.setPrice(BigDecimal.valueOf(product.getDiscountedPrice()));
 					newItem.setQuantity(0); // Initial quantity set to 0, will increment later
 					cart.getItems().add(newItem);
@@ -123,7 +123,7 @@ public class CartServiceImpl implements CartService {
 		Cart cart = cartRepo.findByCustomer_UserIdAndStore_Id(userId, removeItemFromCart.getStoreId())
 				.orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_CART_NOT_FOUND));
 		CartItem cartItem = cart.getItems().stream()
-				.filter(item -> item.getProducts().getId().equals(removeItemFromCart.getProductId())).findFirst()
+				.filter(item -> item.getProduct().getId().equals(removeItemFromCart.getProductId())).findFirst()
 				.orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_PRODUCT_NOT_FOUND));
 		if (removeCompletely || cartItem.getQuantity() == 1) {
 			cart.getItems().remove(cartItem);
@@ -151,7 +151,6 @@ public class CartServiceImpl implements CartService {
 					.orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_CART_NOT_FOUND));
 		}
 		validateOffer(offer, cart);
-
 		cart.setAppliedOffer(offer);
 		cartRepo.save(cart);
 		updateCartTotals(cart);
@@ -359,7 +358,7 @@ public class CartServiceImpl implements CartService {
 		}
 		CartItem newItem = new CartItem();
 		newItem.setCart(tempCart);
-		newItem.setProducts(product);
+		newItem.setProduct(product);
 		newItem.setPrice(BigDecimal.valueOf(product.getDiscountedPrice()));
 		newItem.setQuantity(1);
 		tempCart.getItems().add(newItem);

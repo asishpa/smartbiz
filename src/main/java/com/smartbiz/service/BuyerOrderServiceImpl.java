@@ -113,10 +113,10 @@ public class BuyerOrderServiceImpl implements BuyerOrderService {
 	private void validateAndReserveInventory(Cart cart) {
 		for (var cartItem : cart.getItems()) {
 			List<ProductWarehouseInventory> inventories = inventoryRepo
-					.findByProduct_IdAndWarehouse_Store_Id(cartItem.getProducts().getId(), cart.getStore().getId());
+					.findByProduct_IdAndWarehouse_Store_Id(cartItem.getProduct().getId(), cart.getStore().getId());
 			if (inventories.isEmpty()) {
 				throw new InsufficientInventoryException(
-						"No inventory for product:" + cartItem.getProducts().getProductName());
+						"No inventory for product:" + cartItem.getProduct().getProductName());
 			}
 			int totalAvailable = inventories.stream().mapToInt(ProductWarehouseInventory::getQuantity).sum();
 			if (totalAvailable < cartItem.getQuantity()) {
@@ -167,7 +167,7 @@ public class BuyerOrderServiceImpl implements BuyerOrderService {
 		cart.getItems().forEach(cartItem -> {
 			OrderItem orderItem = new OrderItem();
 			orderItem.setOrder(order);
-			orderItem.setProduct(cartItem.getProducts());
+			orderItem.setProduct(cartItem.getProduct());
 			orderItem.setQty(cartItem.getQuantity());
 			orderItem.setPrice(cartItem.getPrice());
 			orderItem.setSubtotal(cartItem.getPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity())));

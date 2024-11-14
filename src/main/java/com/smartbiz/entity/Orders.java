@@ -53,7 +53,7 @@ public class Orders {
 	@Builder.Default
 	private List<OrderStatusHistory> statusHistory = new ArrayList<>();
 
-	@OneToOne
+	@ManyToOne
 	@JoinColumn(name = "offer_id")
 	private Offer offer;
 
