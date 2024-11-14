@@ -122,17 +122,18 @@ public class CartServiceImpl implements CartService {
 			boolean removeCompletely) {
 		Cart cart = cartRepo.findByCustomer_UserIdAndStore_Id(userId, removeItemFromCart.getStoreId())
 				.orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_CART_NOT_FOUND));
+		System.out.println("enetered cart1");
 		CartItem cartItem = cart.getItems().stream()
 				.filter(item -> item.getProduct().getId().equals(removeItemFromCart.getProductId())).findFirst()
 				.orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_PRODUCT_NOT_FOUND));
+		System.out.println("enetered cart2");
 		if (removeCompletely || cartItem.getQuantity() == 1) {
 			cart.getItems().remove(cartItem);
 			cartItemRepo.delete(cartItem);
 		} else {
 			cartItem.setQuantity(cartItem.getQuantity() - 1);
-			
+			cartItemRepo.save(cartItem);
 		}
-		cartItemRepo.save(cartItem);
 
 		updateCartTotals(cart);
 		return createCartResponse(cart);
