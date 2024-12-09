@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.smartbiz.annotation.PublicEndpoint;
@@ -39,24 +40,29 @@ public class ProductController {
 		List<CategoriesDTO> categories = categoryService.viewCategory(storeId);
 		return new ResponseEntity<>(categories, HttpStatus.OK);
 	}
+
 	@GetMapping("/public/{storeId}/categories")
 	@PublicEndpoint
-	public ResponseEntity<List<CategoriesDTO>> viewBuyerCategories(@PathVariable String storeId){
+	public ResponseEntity<List<CategoriesDTO>> viewBuyerCategories(@PathVariable String storeId) {
 		List<CategoriesDTO> categories = categoryService.viewCategory(storeId);
-		return new ResponseEntity<>(categories,HttpStatus.OK);
+		return new ResponseEntity<>(categories, HttpStatus.OK);
 	}
+
 	@PostMapping("/{storeId}/categories")
 	public ResponseEntity<List<CategoriesDTO>> addCategory(@RequestBody AddCategory addCategory,
 			@PathVariable String storeId) {
 		List<CategoriesDTO> categories = categoryService.addCategory(storeId, addCategory);
 		return new ResponseEntity<>(categories, HttpStatus.CREATED);
 	}
+
 	@GetMapping("/public/{storeId}/categories/{categoryId}")
 	@PublicEndpoint
-	public ResponseEntity<CategoriesDTO> getCategoryById(@PathVariable String storeId,@PathVariable String categoryId){
+	public ResponseEntity<CategoriesDTO> getCategoryById(@PathVariable String storeId,
+			@PathVariable String categoryId) {
 		CategoriesDTO category = categoryService.getCategoryById(storeId, categoryId);
-		return new ResponseEntity<>(category,HttpStatus.OK);
+		return new ResponseEntity<>(category, HttpStatus.OK);
 	}
+
 	@DeleteMapping("/{storeId}/categories/{categoryId}")
 	public ResponseEntity<List<CategoriesDTO>> deleteCategory(@PathVariable String storeId,
 			@PathVariable String categoryId) {
@@ -89,21 +95,30 @@ public class ProductController {
 
 	@GetMapping("/public/{storeId}/products")
 	@PublicEndpoint
-	public ResponseEntity<List<ProductsDTO>> getProduct(@PathVariable String storeId) {
-		List<ProductsDTO> products = productService.getProducts(storeId);
+	public ResponseEntity<List<ProductsDTO>> getProduct(@PathVariable String storeId,
+			@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+
+		List<ProductsDTO> products = productService.getProducts(storeId, page, size);
 		return new ResponseEntity<>(products, HttpStatus.OK);
 	}
+
 	@GetMapping("/{storeId}/products")
-	public ResponseEntity<List<ProductsDTO>> getBuyerProducts(@PathVariable String storeId){
-		List<ProductsDTO> products = productService.getProducts(storeId);
+	public ResponseEntity<List<ProductsDTO>> getBuyerProducts(@PathVariable String storeId,
+			@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "10") int size)  {
+		
+		List<ProductsDTO> products = productService.getProducts(storeId,page,size);
 		return new ResponseEntity<>(products, HttpStatus.OK);
 	}
+
 	@GetMapping("/public/{storeId}/categories/{categoryId}/products")
 	@PublicEndpoint
-	public ResponseEntity<List<ProductsDTO>> getProductByCategoryId(@PathVariable String storeId,@PathVariable String categoryId){
+	public ResponseEntity<List<ProductsDTO>> getProductByCategoryId(@PathVariable String storeId,
+			@PathVariable String categoryId) {
 		List<ProductsDTO> products = productService.getProductByCategoryId(storeId, categoryId);
-		return new ResponseEntity<>(products,HttpStatus.OK);
+		return new ResponseEntity<>(products, HttpStatus.OK);
 	}
+
 	@PatchMapping("/{storeId}/products/{productId}/partial-update")
 	public ResponseEntity<ProductsDTO> partialUpdateProduct(@PathVariable String storeId,
 			@PathVariable String productId, @RequestBody Toggle toggle) {
@@ -127,10 +142,11 @@ public class ProductController {
 		ProductsDTO updatedProduct = productService.updateProduct(storeId, productId, addProduct);
 		return new ResponseEntity<>(updatedProduct, HttpStatus.OK);
 	}
+
 	@GetMapping("/public/{storeId}/products/{productId}")
 	@PublicEndpoint
-	public ResponseEntity<ProductsDTO> getProductById(@PathVariable String storeId,@PathVariable String productId){
+	public ResponseEntity<ProductsDTO> getProductById(@PathVariable String storeId, @PathVariable String productId) {
 		ProductsDTO product = productService.getProductByProductId(storeId, productId);
-		return new ResponseEntity<>(product,HttpStatus.OK);
+		return new ResponseEntity<>(product, HttpStatus.OK);
 	}
 }

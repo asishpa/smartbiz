@@ -8,7 +8,7 @@ import com.smartbiz.model.Toggle;
 
 public interface ProductService {
 	public List<ProductsDTO> addProduct(String storeId,AddProduct addProduct);
-	public List<ProductsDTO> getProducts(String storeId);
+	public List<ProductsDTO> getProducts(String storeId,int page,int size);
 	public boolean deleteProduct(String storeId,String productId);
 	public ProductsDTO partialUpdate(String storeId,String productId ,Boolean status);
 	public ProductsDTO updateProduct(String storeId,String productId,AddProduct addProduct);

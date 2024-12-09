@@ -25,4 +25,6 @@ public class OrderDTO {
 	private String customerName; // Assuming the customer's name is needed
 	private String storeName; // Assuming the store's name is needed
 	private LocalDateTime createdAt;
+	private String checkoutSessionUrl;
+	private String checkoutSessionId;
 }

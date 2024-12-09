@@ -15,15 +15,20 @@ import com.smartbiz.entity.Cart;
 import com.smartbiz.entity.OrderItem;
 import com.smartbiz.entity.Orders;
 import com.smartbiz.entity.Orders.OrderStatus;
+import com.smartbiz.entity.Orders.PaymentMethod;
+import com.smartbiz.entity.Orders.PaymentStatus;
 import com.smartbiz.entity.ProductWarehouseInventory;
 import com.smartbiz.exceptions.BusinessException;
 import com.smartbiz.exceptions.InsufficientInventoryException;
+import com.smartbiz.exceptions.PaymentException;
 import com.smartbiz.exceptions.ResourceNotFoundException;
 import com.smartbiz.mapper.EntityMapper;
 import com.smartbiz.model.CreateOrder;
 import com.smartbiz.repository.CartRepository;
 import com.smartbiz.repository.InventoryRepo;
 import com.smartbiz.repository.OrderRepository;
+import com.stripe.exception.StripeException;
+import com.stripe.model.checkout.Session;
 
 @Service
 public class BuyerOrderServiceImpl implements BuyerOrderService {
@@ -36,6 +41,9 @@ public class BuyerOrderServiceImpl implements BuyerOrderService {
 
 	@Autowired
 	private OrderRepository orderRepo;
+
+	@Autowired
+	private StripePaymentService paymentService;
 
 	@Autowired
 	private EntityMapper entityMapper;
@@ -53,15 +61,18 @@ public class BuyerOrderServiceImpl implements BuyerOrderService {
 
 		try {
 			Cart cart = validateCart(userId, storeId, false);
-			validateAndReserveInventory(cart);
-			System.out.println("enetered afetr validate");
-			Orders order = createOrderFromCart(createOrder);
-			orderRepo.save(order);
-			cartRepo.delete(cart);
-			return entityMapper.toOrderDTO(order);
+			System.out.println("entered after validate");
+			if (createOrder.getPaymentMethod() == PaymentMethod.ONLINE) {
+				System.out.println("enetered in online mode");
+				return handleOnlinePayment(cart);
+			} else if (createOrder.getPaymentMethod() == PaymentMethod.COD) {
+
+				return handleCod(cart);
+			} else {
+				throw new BusinessException("Unsupported Payment method" + createOrder.getPaymentMethod());
+			}
+
 		} catch (Exception e) {
-			// System.out.print(e.printStackTrace());
-			e.printStackTrace();
 			throw new BusinessException(AppConstants.ERROR_ORDER_CREATE_FAIL);
 		}
 
@@ -82,16 +93,70 @@ public class BuyerOrderServiceImpl implements BuyerOrderService {
 		});
 		return entityMapper.toOrderDTO(order);
 	}
+
 	@Override
 	@Transactional(isolation = Isolation.REPEATABLE_READ)
-	public OrderDTO cancelOrder(String orderId,String reason) {
+	public OrderDTO cancelOrder(String orderId, String reason) {
 		Orders order = orderRepo.findById(orderId)
 				.orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_ORDER_NOT_FOUND));
 		if (!OrderStatus.PENDING.equals(order.getStatus())) {
-			throw new BusinessException("Order cannot be cancelled in current status:"+order.getStatus());
+			throw new BusinessException("Order cannot be cancelled in current status:" + order.getStatus());
 		}
-		
+
 		return null;
+	}
+
+	public OrderDTO confirmOrder(String sessionId, CreateOrder createOrder) {
+		try {
+			boolean isSuccessful = paymentService.verifyPayment(sessionId);
+			if (!isSuccessful) {
+				throw new PaymentException("Payment unsuccessful");
+			}
+			Cart cart = cartRepo.findById(createOrder.getCartId())
+					.orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_CART_NOT_FOUND));
+			String warehouseId = validateAndReserveInventory(cart);
+			Orders order = createOrderFromCart(cart, warehouseId);
+			order.setPaymentMethod(PaymentMethod.ONLINE);
+			order.setPaymentStatus(PaymentStatus.PAID);
+			orderRepo.save(order);
+			cartRepo.delete(cart);
+			return entityMapper.toOrderDTO(order);
+
+		} catch (
+
+		StripeException e) {
+
+			throw new PaymentException("Payment failed" + e.getMessage());
+		} catch (Exception e) {
+			returnInventoryToStock(null);
+			throw new BusinessException(AppConstants.ERROR_ORDER_CREATE_FAIL);
+		}
+	}
+
+	private OrderDTO handleCod(Cart cart) {
+		String warehouseId = validateAndReserveInventory(cart);
+		Orders order = createOrderFromCart(cart, warehouseId);
+		order.setPaymentMethod(PaymentMethod.COD);
+		orderRepo.save(order);
+		cartRepo.delete(cart);
+		return entityMapper.toOrderDTO(order);
+	}
+
+	private OrderDTO handleOnlinePayment(Cart cart) {
+		try {
+			System.out.println("enetered in online mode1");
+			Session checkoutSession = paymentService.createCheckoutSession(cart);
+			System.out.println(checkoutSession.getId());
+			OrderDTO pendingOrder = new OrderDTO();
+			pendingOrder.setCheckoutSessionUrl(checkoutSession.getUrl());
+			pendingOrder.setCheckoutSessionId(checkoutSession.getId());
+			pendingOrder.setStatus(OrderStatus.PENDING);
+			return pendingOrder;
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new PaymentException("Failed to initalize payment.:" + e.getMessage());
+		}
+
 	}
 
 	private Cart validateCart(String userId, String storeId, boolean buynow) {
@@ -110,49 +175,52 @@ public class BuyerOrderServiceImpl implements BuyerOrderService {
 		return cart;
 	}
 
-	private void validateAndReserveInventory(Cart cart) {
+	private String validateAndReserveInventory(Cart cart) {
 		for (var cartItem : cart.getItems()) {
 			List<ProductWarehouseInventory> inventories = inventoryRepo
 					.findByProduct_IdAndWarehouse_Store_Id(cartItem.getProduct().getId(), cart.getStore().getId());
+
 			if (inventories.isEmpty()) {
 				throw new InsufficientInventoryException(
-						"No inventory for product:" + cartItem.getProduct().getProductName());
+						"No inventory for product: " + cartItem.getProduct().getProductName());
 			}
+
 			int totalAvailable = inventories.stream().mapToInt(ProductWarehouseInventory::getQuantity).sum();
 			if (totalAvailable < cartItem.getQuantity()) {
 				throw new InsufficientInventoryException(AppConstants.INSUFFICIENT_QUANTITY);
 			}
-			reserveInventory(cartItem.getQuantity(), inventories);
+
+			// Reserve inventory and return the selected warehouse ID
+			return reserveInventory(cartItem.getQuantity(), inventories);
 		}
+		throw new BusinessException("Unable to reserve inventory");
 
 	}
 
 	// delete the entire quantity from one inventory or from multiple
-	private void reserveInventory(int requiredQty, List<ProductWarehouseInventory> inventories) {
+	private String reserveInventory(int requiredQty, List<ProductWarehouseInventory> inventories) {
 		int remainingQty = requiredQty;
 
 		for (ProductWarehouseInventory inventory : inventories) {
-			if (requiredQty <= 0) {
+			if (requiredQty <= 0)
 				break;
-			}
-			// calculate the qty to be reserved
+
 			int availableQty = inventory.getQuantity();
 			int deductQty = Math.min(remainingQty, availableQty);
-			// deduct the qty from inventory
 			inventory.setQuantity(availableQty - deductQty);
-			requiredQty -= deductQty;
-			// save to db
+			remainingQty -= deductQty;
 			inventoryRepo.save(inventory);
 
+			// Return the warehouse ID of the reserved inventory
+			return inventory.getWarehouse().getWarehouseId();
 		}
+		throw new InsufficientInventoryException("Failed to reserve inventory");
 
 	}
 
-	private Orders createOrderFromCart(CreateOrder createOrder) {
-		Cart cart = cartRepo.findById(createOrder.getCartId())
-				.orElseThrow(() -> new ResourceNotFoundException(AppConstants.ERROR_CART_NOT_FOUND));
+	private Orders createOrderFromCart(Cart cart, String warehouseId) {
+
 		Orders order = Orders.builder().orderAmt(cart.getTotal()).status(OrderStatus.PENDING)
-				.paymentMethod(createOrder.getPaymentMethod()).orderType(createOrder.getFulfillmentType())
 				.buyerAddress(cart.getDeliveryAddress()).offer(cart.getAppliedOffer()).customer(cart.getCustomer())
 				.store(cart.getStore()).build();
 		// Apply the offer's discount if applicable
@@ -175,12 +243,20 @@ public class BuyerOrderServiceImpl implements BuyerOrderService {
 			order.addItem(orderItem);
 		});
 		order.updateStatus(OrderStatus.PENDING, "Order Created");
+		order.setWarehouseId(warehouseId);
 		return order;
 	}
-	private void returnInventoryToStock(Orders order) {
-		
-	}
 
-	
+	private void returnInventoryToStock(Orders order) {
+		order.getItems().forEach(orderItem -> {
+			List<ProductWarehouseInventory> inventories = inventoryRepo
+					.findByProduct_IdAndWarehouse_Store_Id(orderItem.getProduct().getId(), order.getStore().getId());
+
+			inventories.forEach(inventory -> {
+				inventory.setQuantity(inventory.getQuantity() + orderItem.getQty());
+				inventoryRepo.save(inventory);
+			});
+		});
+	}
 
 }

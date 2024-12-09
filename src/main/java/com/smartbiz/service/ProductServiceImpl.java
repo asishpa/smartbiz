@@ -5,6 +5,8 @@ import java.util.stream.Collectors;
 
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import com.google.common.base.Optional;
@@ -89,10 +91,10 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	@Override
-	public List<ProductsDTO> getProducts(String storeId) {
+	public List<ProductsDTO> getProducts(String storeId,int page,int size) {
 		Store store = storeRepo.findById(storeId)
 				.orElseThrow(() -> new ResourceNotFoundException("Store does not exist with the specified storeId"));
-
+		Page<Products> productPage = productRepo.findByStore(store, PageRequest.of(page, size));
 		return productRepo.findByStore(store).stream().map(entityMapper::toProductsDTO).collect(Collectors.toList());
 
 	}

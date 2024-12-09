@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 
+import com.cloudinary.Api;
+
 import jakarta.annotation.PostConstruct;
 
 @RestControllerAdvice
@@ -82,8 +84,14 @@ public class GlobalExceptionsHandler {
 		ApiError errorDetails = new ApiError(new Date(), ex.getMessage(), request.getDescription(false));
 		return new ResponseEntity<>(errorDetails,HttpStatus.NOT_FOUND);
 	}
+	@ExceptionHandler(InsufficientInventoryException.class)
 	public ResponseEntity<ApiError> handleInsufficientInventoryException(InsufficientInventoryException ex,WebRequest request){
 		ApiError errorDetails = new ApiError(new Date(), ex.getMessage(), request.getDescription(false));
 		return new ResponseEntity<>(errorDetails,HttpStatus.PRECONDITION_FAILED);
+	}
+	@ExceptionHandler(PaymentException.class)
+	public ResponseEntity<ApiError> handlePaymentException(PaymentException ex,WebRequest request){
+		ApiError errorDetails = new ApiError(new Date(), ex.getMessage(), request.getDescription(false));
+		return new ResponseEntity<>(errorDetails,HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 }

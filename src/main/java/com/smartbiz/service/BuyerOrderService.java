@@ -10,5 +10,6 @@ public interface BuyerOrderService {
 	 List<OrderDTO> getAllOrders(String userId, String storeId);
 	 OrderDTO getOrderById(String userId, String orderId);
 	 public OrderDTO cancelOrder(String orderId,String reason);
+	 public OrderDTO confirmOrder(String sessionId,CreateOrder createOrder);
 }
-
+;

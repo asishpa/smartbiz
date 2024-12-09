@@ -43,5 +43,10 @@ public class BuyerOrderController {
 		OrderDTO order = buyerOrderService.getOrderById(userId, orderId);
 		return new ResponseEntity<>(order,HttpStatus.OK);
 	}
+	@PostMapping("/payment/confirm")
+    public ResponseEntity<OrderDTO> confirmPayment(@RequestParam String sessionId, @RequestBody CreateOrder createOrder) {
+        OrderDTO order = buyerOrderService.confirmOrder(sessionId, createOrder);
+        return new ResponseEntity<>(order, HttpStatus.OK);
+    }
 
 }

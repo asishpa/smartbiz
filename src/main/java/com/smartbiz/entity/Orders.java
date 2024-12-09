@@ -8,6 +8,7 @@ import java.util.List;
 import org.hibernate.annotations.CreationTimestamp;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -41,10 +42,14 @@ public class Orders {
 	private PaymentMethod paymentMethod;
 	@Enumerated(EnumType.STRING)
 	private FulfillmentType orderType;
-
+	@Enumerated(EnumType.STRING)
+	private PaymentStatus paymentStatus;
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "address_id", nullable = false)
 	private BuyerAddress buyerAddress;
+	
+	@Column(nullable = false)
+	private String warehouseId;
 
 	@OneToMany(mappedBy = "order")
 	// Orders items/statusHistory by createdAt in descending order, so the most
@@ -73,7 +78,8 @@ public class Orders {
 	public Orders() {
         this.statusHistory = new ArrayList<>();  // Ensures statusHistory is never null
         this.items = new ArrayList<>();  // Ensures items is never null
-    }
+        this.paymentStatus = PaymentStatus.PENDING;
+	}
 
 	// helper methods
 	public void addItem(OrderItem item) {
@@ -126,5 +132,8 @@ public class Orders {
 
 	public enum FulfillmentType {
 		DELIVERY, PICKUP
+	}
+	public enum PaymentStatus{
+		PENDING,PAID
 	}
 }
