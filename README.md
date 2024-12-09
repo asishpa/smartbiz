@@ -9,7 +9,7 @@ This project is in active development. New features are continuously being added
 
 ## Links:
 - **Seller Dashboard**: [StoreSync Seller Dashboard](https://storesync.vercel.app/)
-- **Buyer Storefront**: [StoreSync Buyer Storefront](https://buysync.vercel.app/{storeName})
+- **Buyer Storefront**: [StoreSync Buyer Storefront](https://buysync.vercel.app/).
 
 ---
 
